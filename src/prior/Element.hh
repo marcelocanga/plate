@@ -5,9 +5,7 @@
 #include<vector>
 #include<map>
 #include<set>
-
 #include "Array.hh"
-#include "Point.hh"
 
 class Plate{
 public:
@@ -17,8 +15,8 @@ public:
   std::string name;
   std::vector<Point*> point_v;
   std::vector<int>    index_v;
-  static std::map<std::string, Plate*> plate_m;
-  
+  static std::map<std::string, Element*> element_m;
+
   void init();
   void SamplePoint(int);
  

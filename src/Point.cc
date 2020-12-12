@@ -1,5 +1,6 @@
 #include<sstream>
 #include "Plate.hh"
+#include "Point.hh"
 
 
 std::string Point::new_name()
