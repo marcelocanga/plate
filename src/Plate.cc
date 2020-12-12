@@ -1,14 +1,14 @@
 #include "Point.hh"
 #include "Load.hh"
 #include "Plate.hh"
+#include "Essential.hh"
 
 void Plate::init()
 {
   ninteg   = 2;
-  tickness = 0.1;
-  young    = 2e5;
-  poisson  = 0.3;
+  area     = d_zero;
 }
+
 void Plate::SamplePoint(int integ){
 
 }

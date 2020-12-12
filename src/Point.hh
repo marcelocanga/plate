@@ -10,11 +10,21 @@
 struct LtPoint;
 
 class Point {
-public:
+  
+protected:
+  
   std::string name;
   Coord coor;
+  
+public:
+  friend class LtPoint;
+  friend class Solver;
+  friend class Plate;
+  friend class Load;
+
   static std::map<std::string, Point*> point_m;
   static std::set<Point*,LtPoint> u_point_s;
+
   std::string new_name();
   
 };

@@ -10,13 +10,21 @@
 #include "Point.hh"
 
 class Plate{
-public:
+
+protected:
+  
   int ninteg;
-  double young, poisson, tickness, area;
+  double area;
   
   std::string name;
   std::vector<Point*> point_v;
   std::vector<int>    index_v;
+
+public:
+  friend class Point;
+  friend class Solver;
+  friend class Load;
+  
   static std::map<std::string, Plate*> plate_m;
   
   void init();

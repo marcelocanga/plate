@@ -8,11 +8,27 @@
 #include "Array.hh"
 
 class Solver {
+
+protected:
+  
+  double poisson, thickness, young;
+  Solver* current_solver;
   std::vector<double> rhs;
   std::vector<double> lhs;
+  
 public:
+
+  friend class Point;
+  friend class Plate;
+  friend class Load;
+
+  Solver();
+  Solver* current(){ return current_solver;}
+  void parse_input(std::string);
+  
   void assemble();
   void solve();
+  
 };
 
 #endif
