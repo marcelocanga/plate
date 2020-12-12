@@ -14,7 +14,7 @@ void Plate::SamplePoint(int integ){
 }
 
 
-void Plate::add_point(){
+void Plate::add_edge(){
 }
 
 void Plate::assemble(){

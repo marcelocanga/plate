@@ -1,5 +1,8 @@
 $
-$ Three triangles in cantilever 
+$ Three triangles in cantilever This is a constant strain problem with non-symmetric mesh
+$
+$
+$*********************************************      points for a 2x1 plate
 $
 *point
 1 0 0 0
@@ -7,8 +10,38 @@ $
 3 1 1 0
 4 2 0 0
 5 2 1 0
+$
+$*********************************************      3 plates
+$
 *plate
 e1 1 3 2
 e2 3 4 5
 e3 1 4 3
+$
+$*********************************************      material properties and thickness
+$
+*thickness
+0.1
+*young
+1.e5
+*poisson
+0
+$
+$*********************************************      end moment in element e2, side 2
+$
+*moment
+e2 2 1.0
+$
+$*********************************************      support in element 1, side 3
+$
+*support
+e1 3
+$
+$*********************************************      doit
+$
+*solve
+run
+$
+$*********************************************      done
+$
 *end

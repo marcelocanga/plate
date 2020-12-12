@@ -30,7 +30,7 @@ public:
   void init();
   void SamplePoint(int);
  
-  void add_point();
+  void add_edge();
   void assemble();
   void potential();
 
