@@ -1,0 +1,78 @@
+#
+#*********************************************      compilers
+#
+set(type_FLAGS "-DTYPE_INTEGER=INTEGER -DTYPE_D_INTEGER=INTEGER*8 -DTYPE_S_INTEGER=INTEGER*2               \
+                -DTYPE_BYTE=INTEGER*1 -DTYPE_REAL=REAL -DTYPE_D_REAL=REAL*8 -DTYPE_COMPLEX=COMPLEX         \
+		-DTYPE_D_COMPLEX=COMPLEX*16 -DTYPE_NAME=REAL*8 -DTYPE_SAU=INTEGER*2 -DTYPE_LOGICAL=LOGICAL \
+		-DTYPE_CHARACTER=CHARACTER -DTYPE_POINTER=INTEGER*8   ")
+#.............................................     windows cross compiler
+#
+if( ${U_ARCH} MATCHES  cros_64 )
+
+ set(CMAKE_SYSTEM_NAME WindowsStore)
+ set(CMAKE_SYSTEM_VERSION 10.0)
+ set(CMAKE_CROSSCOMPILING ON)
+
+ list(APPEND CMAKE_PREFIX_PATH "/add/mxe/usr/x86_64-w64-mingw32.static/qt5")
+ list(APPEND CMAKE_PREFIX_PATH "/add/mxe/usr/x86_64-w64-mingw32.static/lib")
+ list(APPEND CMAKE_PREFIX_PATH "/add/mxe/usr/lib/gcc/x86_64-w64-mingw32.static/5.5.0")
+ list(APPEND CMAKE_PREFIX_PATH "/builder/beta/cmake/qt-basic/lib")
+
+ set(CMAKE_C_COMPILER           /add/mxe/usr/bin/x86_64-w64-mingw32.static-gcc  ) 
+ set(CMAKE_CXX_COMPILER         /add/mxe/usr/bin/x86_64-w64-mingw32.static-g++  )
+ set(CMAKE_Fortran_COMPILER     /add/mxe/usr/bin/x86_64-w64-mingw32.static-gfortran  )
+
+ set(QT_BINARY_HOST_DIR      /add/mxe/usr/x86_64-w64-mingw32.static/qt5/bin )
+
+# -fno-underscoring 
+
+ set(CMAKE_Fortran_FLAGS  "-m64 -Dcros_64 -pipe -fPIC  -fexceptions -cpp  -Walign-commons -Wunused-dummy-argument ${type_FLAGS}" )
+
+endif()
+#.............................................      macos
+#
+
+if(${U_ARCH} MATCHES  mac_64 )
+
+ list(APPEND CMAKE_PREFIX_PATH "/fe/Qt/5.7/clang_64")
+ list(APPEND CMAKE_PREFIX_PATH "/usr/bin")
+ 
+ set(CMAKE_Fortran_COMPILER_WORKS 1)       
+
+ set(CMAKE_Fortran_COMPILER     /usr/local/bin/gfortran CACHE STRING "" FORCE )
+ set(CMAKE_C_COMPILER           /usr/bin/clang          CACHE STRING "" FORCE ) 
+ set(CMAKE_CXX_COMPILER         /usr/bin/clang++        CACHE STRING "" FORCE )
+
+
+set(CMAKE_Fortran_FLAGS  "-m64 -Dmac_64 -pipe -fPIC  -fexceptions -cpp  -Walign-commons -Wunused-dummy-argument ${type_FLAGS}" )
+
+endif()
+#.............................................      windows 10 msys
+#
+if( ${U_ARCH} MATCHES  msys  )
+
+ list(APPEND CMAKE_PREFIX_PATH  "C:/msys64/mingw64/qt5-static")
+ list(APPEND CMAKE_PREFIX_PATH  "C:/msys64/mingw64/lib")
+
+ set(CMAKE_C_COMPILER           "C:/msys64/mingw64/bin/gcc.exe"  ) 
+ set(CMAKE_CXX_COMPILER         "C:/msys64/mingw64/bin/g++.exe"  )
+ set(CMAKE_Fortran_COMPILER     "C:/msys64/mingw64/bin/gfortran.exe"  )
+
+ set(CMAKE_Fortran_FLAGS  "-m64 -Dmsys -pipe -fPIC  -fexceptions -cpp  -Walign-commons -Wunused-dummy-argument ${type_FLAGS}" )
+
+endif()
+#
+#*********************************************      
+#
+#set(CMAKE_C_FLAGS_RELEASE    "-O2"   )
+#set(CMAKE_C_FLAGS_DEBUG      "-O0 -g")
+#set(CMAKE_CXX_FLAGS_DEBUG    "-O0 -g")
+#set(CMAKE_CXX_FLAGS_RELEASE  "-O2"   )
+#set(CMAKE_Fortran_FLAGS_RELEASE "-O2"   )
+#set(CMAKE_Fortran_FLAGS_DEBUG "-O0 -g"  )
+
+set(CMAKE_C_FLAGS       "-g"   CACHE STRING "" FORCE)
+set(CMAKE_CXX_FLAGS     "-g"   CACHE STRING "" FORCE)
+set(CMAKE_Fortran_FLAGS "-g ${CMAKE_Fortran_FLAGS}" CACHE STRING "" FORCE )
+
+
