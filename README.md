@@ -7,6 +7,6 @@
 
 ## Example. example/3-plate.inp
 
-<img style="float: left;" src="repository/3-plate.png">
+<img style="float: left;" src="resource/3-plate.png">
 
 ## Reference
