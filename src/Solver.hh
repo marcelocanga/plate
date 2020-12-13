@@ -10,7 +10,7 @@
 class Solver {
 
 protected:
-  
+  int ndof;
   double poisson, thickness, young;
   Solver* current_solver;
   std::vector<double> rhs;

@@ -141,8 +141,10 @@ void Solver::parse_input(std::string file_name){
 //.............................................      solver
 //
     case solve_a:{
+      ndof = 0;
       std::cout<<"Solver starts."<<std::endl;
       for(auto const& [first,second] : Plate::plate_m) second->add_edge();
+      for(auto const& [first,second] : Plate::plate_m) second->count_dof(ndof);
       assemble();
       solve();
     }
@@ -162,7 +164,7 @@ void Solver::assemble()
 {
   //  for(auto const& [first,second] : Plate::element_m) second->build_index();
   for(auto const& [first,second] : Plate::plate_m) second->assemble();
-  for(auto const&  first         : Load::load_v)       first->assemble();
+  for(auto const&  first         : Load::load_v)   first->assemble();
 }     
 
 void Solver::solve()

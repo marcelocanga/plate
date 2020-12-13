@@ -15,17 +15,22 @@ protected:
   
   std::string name;
   Coord coor;
+  ICoor2 pdof_loc;
   
 public:
+  
   friend class LtPoint;
   friend class Solver;
   friend class Plate;
   friend class Load;
 
   static std::map<std::string, Point*> point_m;
-  static std::set<Point*,LtPoint> u_point_s;
+  static std::set<Point*,LtPoint>      u_point_s;
 
   std::string new_name();
+
+  int& pcount_dof(const int& k,int& icount);
+  void pclean_dof();
   
 };
 

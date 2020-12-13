@@ -13,12 +13,23 @@ class Plate{
 
 protected:
   
+  std::string name;
+  
   int ninteg;
   double area;
-  
-  std::string name;
+  int nnode,nedge,nidof,eldim,ndof;
+
   std::vector<Point*> point_v;
-  std::vector<int>    index_v;
+  AInt edof_loc;
+
+  static int ip;
+  static double wgt,xr,xs;
+  static double wg[3], xg[3][2];
+  static ADouble shape,shape_h;
+  static MDouble b_shape, b_shape_h;
+  
+  static ADouble fint;
+  static MDouble stiff;
 
 public:
   friend class Point;
@@ -31,6 +42,8 @@ public:
   void SamplePoint(int);
  
   void add_edge();
+  void count_dof(int& icount);
+  
   void assemble();
   void potential();
 
