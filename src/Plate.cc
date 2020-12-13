@@ -102,12 +102,12 @@ void Plate::Shape()
   b_shape(0,0) = -1.0; 
   b_shape(1,0) =  1.0;
   b_shape(2,0) =  0.0;
-  b_shape(3,0) =  xs - 2 * xr * xs - xs * xs;
+  b_shape(3,0) =  xs - 2.0 * xr * xs - xs * xs;
   
   b_shape(0,1) = -1.0;
   b_shape(1,1) =  0.0;
   b_shape(2,1) =  1.0;
-  b_shape(3,1) =  xr -  xr * xr  - 2.0 * xr * xs;
+  b_shape(3,1) =  xr - 2.0 * xr * xs - xr * xr ;
 }
 
 void Plate::ShapeH()
@@ -117,11 +117,11 @@ void Plate::ShapeH()
   shape_h(2) =  1.0 - 2.0 * xr;
     
   b_shape_h(0,0) =  0.0;
-  b_shape_h(1,0) =  2.0 * xs; 
+  b_shape_h(1,0) =  2.0; 
   b_shape_h(2,0) = -2.0;
 
   b_shape_h(0,1) = -2.0;
-  b_shape_h(1,1) =  2.0 * xr;
+  b_shape_h(1,1) =  2.0;
   b_shape_h(2,1) =  0.0;
 
 }

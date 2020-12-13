@@ -21,9 +21,9 @@
 Solver::Solver()
 {
   current_solver = this;
-  poisson        = 0.3;
-  young          = 2.e6;
-  thickness       = 0.1;
+  def_poisson        = 0.3;
+  def_young          = 2.e6;
+  def_thickness      = 0.1;
 }
 
 
@@ -89,54 +89,100 @@ void Solver::parse_input(std::string file_name){
       iss >> el_pt->name;
       iss >> point[0]>>point[1]>>point[2];
 
+      for (auto nam : point)
+      {
+        if (Point::point_m.count(nam))
+          el_pt->point_v.push_back(Point::point_m[nam]);
+        else
+        {
+          std::cout << "Point in plate not found:" << nam << ", plate" << el_pt->name << std::endl;
+          break;
+        }
+      }
       Plate::plate_m[el_pt->name] = el_pt;
-      
+
+      el_pt->poisson = def_poisson;
+      el_pt->young = def_young;
+      el_pt->thickness = def_thickness;
+
       std::cout<<"Plate:"<<el_pt->name<<","<<point[0]<<","<<point[1]<<","<<point[2]<<std::endl;
     }
       break;
 //.............................................      shear force
 //
     case force_a:{
+      std::string ename;
       Load *lo_pt = new Load(Load::force_a);
-      iss >> lo_pt->ename >>lo_pt->eside >> lo_pt->value;
+      iss >> ename >>lo_pt->eside >> lo_pt->value;
+
+      if(Plate::plate_m.count(ename))
+        lo_pt->el_pt = Plate::plate_m[ename];
+      else{
+        std::cout << "Plate in load force not found:" << ename << std::endl;
+        break;
+      }
+
       Load::load_v.push_back(lo_pt);
 
-      std::cout<<"Shear Force. Plate:"<<lo_pt->ename <<", side:"<<lo_pt->eside <<", value:"<<lo_pt->value <<std::endl;
+      std::cout<<"Shear Force. Plate:"<<ename <<", side:"<<lo_pt->eside <<", value:"<<lo_pt->value <<std::endl;
     }
       break;
 //.............................................      moment
 //
     case moment_a:{
+      int gdir;
+      std::string ename;
       Load *lo_pt = new Load(Load::moment_a);
-      iss >> lo_pt->ename >>lo_pt->eside >> lo_pt->value;
+      
+      iss >> ename >>lo_pt->eside >> gdir >> lo_pt->value;
+      lo_pt->gdir = gdir-1;  // index from 0
+
+      if(Plate::plate_m.count(ename))
+        lo_pt->el_pt = Plate::plate_m[ename];
+      else{
+        std::cout << "Plate in load moment not found:" << ename << std::endl;
+        break;
+      }
+
       Load::load_v.push_back(lo_pt);
-      std::cout<<"Bending Moment Load. Plate:"<<lo_pt->ename <<", side:"<<lo_pt->eside <<", value:"<<lo_pt->value<<std::endl;
-    }
+
+      std::cout<<"Bending Moment Load. Plate:"<<ename <<", side:"<<lo_pt->eside <<", dir:"<<gdir<<", value:"<<lo_pt->value<<std::endl;
+}
       break;
 //.............................................      support
 //
     case support_a:{
+      std::string ename;
       Load *lo_pt = new Load(Load::support_a);
-      iss >> lo_pt->ename >>lo_pt->eside;
+      iss >> ename >>lo_pt->eside;
+
+      if(Plate::plate_m.count(ename))
+        lo_pt->el_pt = Plate::plate_m[ename];
+      else{
+        std::cout << "Plate in support not found:" << ename << std::endl;
+        break;
+      }
+
       Load::load_v.push_back(lo_pt);
-      std::cout<<"Fix Support Condition. Plate:"<<lo_pt->ename <<", side:"<<lo_pt->eside <<std::endl;
+
+      std::cout<<"Fix Support Condition. Plate:"<<ename <<", side:"<<lo_pt->eside <<std::endl;
     }
       break;
 //.............................................      material properties/thickness
 //
     case thickness_a:
-      iss >> thickness;
-      std::cout<<"Plate thickness:"<<thickness<<std::endl;
+      iss >> def_thickness;
+      std::cout<<"Plate thickness:"<<def_thickness<<std::endl;
       break;
       
     case young_a:
-      iss >> young;
-      std::cout<<"Young's modulus:"<<young<<std::endl;
+      iss >> def_young;
+      std::cout<<"Young's modulus:"<<def_young<<std::endl;
       break;
 
     case poisson_a:
-      iss >> poisson;
-      std::cout<<"Poisson's ratio:"<<poisson<<std::endl;
+      iss >> def_poisson;
+      std::cout<<"Poisson's ratio:"<<def_poisson<<std::endl;
       break;
 //.............................................      solver
 //
@@ -162,7 +208,6 @@ void Solver::parse_input(std::string file_name){
 
 void Solver::assemble()
 {
-  //  for(auto const& [first,second] : Plate::element_m) second->build_index();
   for(auto const& [first,second] : Plate::plate_m) second->assemble();
   for(auto const&  first         : Load::load_v)   first->assemble();
 }     

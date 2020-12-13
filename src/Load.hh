@@ -6,13 +6,14 @@
 #include<map>
 #include<set>
 #include "Array.hh"
+#include "Plate.hh"
 
 class Load {
   
 protected:
 
-  std::string ename;
-  int eside;
+  Plate* el_pt;
+  int eside, gdir;
   double value;
   
 public:

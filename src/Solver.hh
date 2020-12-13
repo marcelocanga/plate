@@ -11,7 +11,7 @@ class Solver {
 
 protected:
   int ndof;
-  double poisson, thickness, young;
+  double def_poisson, def_thickness, def_young;
   Solver* current_solver;
   std::vector<double> rhs;
   std::vector<double> lhs;

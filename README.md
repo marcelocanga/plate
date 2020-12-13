@@ -1,22 +1,13 @@
 
-===================
-
-A Simple Qt5 Program Built with CMake 3.8.2
+=== The Reissner-Mindlin Triangular Plate
 
 ## Building MacOS
 
 ## Run the program
 
+## Example. example/3-plate.inp
+![my image](example/3-plate.jpg#left)
 
-
-## input file
-$
-*point
-*element
-*force
-*moment
-*support
-*solve
-*end
+<img style="float: left;" src="example/3-plate.jpg">
 
 ## Reference

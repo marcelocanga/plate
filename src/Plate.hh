@@ -18,6 +18,7 @@ protected:
   int ninteg;
   double area;
   int nnode,nedge,nidof,eldim,ndof;
+  double poisson, thickness, young;
 
   std::vector<Point*> point_v;
   AInt edof_loc;
