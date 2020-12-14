@@ -13,9 +13,8 @@ protected:
   int ndof;
   double def_poisson, def_thickness, def_young;
   Solver* current_solver;
-  std::vector<double> rhs;
-  std::vector<double> lhs;
-  
+  MDouble lhs; 
+  ADouble rhs;
 public:
 
   friend class Point;
@@ -27,7 +26,7 @@ public:
   void parse_input(std::string);
   
   void assemble();
-  void solve();
+  void solve(MDouble& mat, ADouble& vec);
   
 };
 

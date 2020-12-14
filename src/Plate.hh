@@ -16,8 +16,8 @@ protected:
   std::string name;
   
   int ninteg;
-  double area;
-  int nnode,nedge,nidof,eldim,ndof;
+  double area, d_area;
+  int nnode,nedge,nidof,nshear,eldim,ndof;
   double poisson, thickness, young;
 
   std::vector<Point*> point_v;
@@ -27,8 +27,10 @@ protected:
   static double wgt,xr,xs;
   static double wg[3], xg[3][2];
   static ADouble shape,shape_h;
-  static MDouble b_shape, b_shape_h;
-  
+  static MDouble d_shape, d_shape_h;
+  static MDouble b_grad, w_grad;
+  static MDouble constitutive_b;
+  static MDouble constitutive_s;
   static ADouble fint;
   static MDouble stiff;
 
@@ -39,6 +41,7 @@ public:
   
   static std::map<std::string, Plate*> plate_m;
   
+  Plate();
   void init();
   void SamplePoint(int);
  
@@ -51,7 +54,6 @@ public:
   void compute_constitutive();
   void Grad(int);
   void Shape();
-  void ShapeH();
 
   void Force();
   void Fint();

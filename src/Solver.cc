@@ -2,6 +2,13 @@
 #include "Load.hh"
 #include "Solver.hh"
 
+extern "C"{
+#include "Blas.h"
+#include "Lapack.h"
+  int dposv_ (char*,int*,int*,double*,              int*,     double*,               int*, int*);
+  int dgesv_ (int*,int*,      double*,              int*,int*,double*,               int*, int*);
+}
+
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -192,7 +199,7 @@ void Solver::parse_input(std::string file_name){
       for(auto const& [first,second] : Plate::plate_m) second->add_edge();
       for(auto const& [first,second] : Plate::plate_m) second->count_dof(ndof);
       assemble();
-      solve();
+      solve(lhs,rhs);
     }
       break;
 //
@@ -212,5 +219,81 @@ void Solver::assemble()
   for(auto const&  first         : Load::load_v)   first->assemble();
 }     
 
-void Solver::solve()
-{}
+
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+//
+//               -----  void Solver::solve  -----
+//
+//
+// C: 
+//
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+void Solver::solve(MDouble& mat, ADouble& vec)
+{
+  bool is_transpose = false;
+  bool is_symmetric = true;
+  
+  char uplo='U';
+  int  info;
+  int  nrhs  = 1;
+  int  neq   = mat.size1();
+  int  lda   = mat.maxsize2();
+  int  ldb   = vec.maxsize();
+  int    nrow = mat.size1();
+  int    ncol = mat.size2();
+
+  AInt ipivot; 
+  ipivot.dim(neq);
+//
+//*********************************************   
+//
+  std::cout<<"        : rhs  :        "<<std::endl;
+  std::cout<<vec;
+  std::cout<<"        : lhs  :        "<<std::endl;
+  std::cout<<mat;
+  
+//
+//*********************************************      self trasnpose
+//
+  if(is_transpose){
+    double aux;
+
+    if(nrow != ncol)
+      diag_mesg(diag.error,"SlvDenseLU::solve: Matrix is not square:"<<std::endl);
+
+    for(int ii=0; ii<nrow; ii++)
+      for(int jj=ii; jj<ncol; jj++){
+	aux        =   mat(ii,jj);
+	mat(ii,jj) =   mat(jj,ii);
+	mat(jj,ii) =   aux;
+      }
+  }
+
+//
+//*********************************************      symmetrix
+//
+  if(is_symmetric){
+    dposv_(&uplo,&neq,&nrhs,mat.pointer(),&lda,               vec.pointer(),&ldb,&info); //symmetric. works
+  }
+//
+//*********************************************      nonsymetrix
+//
+  else{
+    dgesv_(     &neq,&nrhs,mat.pointer(),&lda,ipivot.pointer(),vec.pointer(),&ldb,&info);
+  }
+//
+//*********************************************      
+//
+  {
+    std::cout<<"        : guess:        "<<vec;
+  }
+
+  if(info > 0){
+    diag_mesg(diag.error,"SlvDenseLu::dposv: Solver error. Error num:"<<info<<std::endl);
+  }
+}
+//
+//*********************************************      new from here. Real.
+//
+
