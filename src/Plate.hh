@@ -17,7 +17,7 @@ protected:
   
   int ninteg;
   double area, d_area;
-  int nnode,nedge,nidof,nshear,eldim,ndof;
+  int nnode,nedge,nidof,nshear,eldim,nedof;
   double poisson, thickness, young;
 
   std::vector<Point*> point_v;
@@ -55,9 +55,7 @@ public:
   void Grad(int);
   void Shape();
 
-  void Force();
   void Fint();
-  void Stretch();
   void Stiffness();
 };
 

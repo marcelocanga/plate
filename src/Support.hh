@@ -1,5 +1,5 @@
-#ifndef _LOAD_FEM_
-#define _LOAD_FEM_
+#ifndef _SUPPORT_FEM_
+#define _SUPPORT_FEM_
 
 #include<string>
 #include<vector>
@@ -8,7 +8,7 @@
 #include "Array.hh"
 #include "Plate.hh"
 
-class Load {
+class Support {
   
 protected:
 
@@ -22,11 +22,8 @@ public:
   friend class Plate;
   friend class Solver;
   
-  enum Type {moment_a,force_a,pressure_a,support_a} type;
-  static std::vector<Load*> load_v;
+  static std::vector<Support*> support_v;
   
-  Load(enum Type _type) : type(_type) {}
-
   void assemble();
   void potential();
 };

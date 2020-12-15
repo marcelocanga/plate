@@ -3,6 +3,7 @@
 #include "Plate.hh"
 #include "Essential.hh"
 #include "Array.hh"
+#include "Solver.hh"
 
 
 double Plate::wg[3]={1.0/3.0,1.0/3.0,1.0/3.0};
@@ -60,7 +61,7 @@ void Plate::init()
   
   eldim    = 2;
 
-  ndof     = (nnode+nidof+nshear)*eldim + nedge ;
+  nedof     = (nnode+nidof+nshear)*eldim + nedge ;
 
   shape.     dim(4);
   shape_h.   dim(3);
@@ -69,8 +70,8 @@ void Plate::init()
   b_grad.    dim(3,8);
   w_grad.    dim(2,3);
 
-  fint.      dim(ndof);
-  stiff.     dim(ndof,ndof);
+  fint.      dim(nedof);
+  stiff.     dim(nedof,nedof);
 
   constitutive_b.dim(3,3);
   constitutive_s.dim(2,2);
@@ -123,6 +124,15 @@ std::cout<<std::endl;
 
 
 
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+//
+//               -----  void Plate::add_edge  -----
+//
+//
+// C: 
+//
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
 void Plate::add_edge(){
   
   Coord coor;
@@ -154,7 +164,24 @@ void Plate::add_edge(){
 
 }
 
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+//
+//               -----  void Plate::assemble  -----
+//
+//
+// C: 
+//
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
 void Plate::assemble(){
+
+  potential();
+
+  for(int ii=0; ii<nedof; ii++){
+  for(int jj=0; jj<nedof; jj++)
+  Solver::current()->lhs(edof_loc[ii],edof_loc[jj]) += stiff(ii,jj);
+  Solver::current()->rhs(edof_loc[ii])              += fint(ii);
+}
 }
 
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -321,7 +348,7 @@ void Plate::Grad(int integ)
 }
 
 void Plate::Fint(){}
-void Plate::Stretch(){}
+
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 //
 //               -----  void Plate::Stiffness  -----

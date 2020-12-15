@@ -26,5 +26,6 @@
 /cros_64
 /mac_64
 /msys
+/test
 .DS_Store
 

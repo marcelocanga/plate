@@ -12,7 +12,7 @@ class Solver {
 protected:
   int ndof;
   double def_poisson, def_thickness, def_young;
-  Solver* current_solver;
+  static Solver* current_solver;
   MDouble lhs; 
   ADouble rhs;
 public:
@@ -20,11 +20,13 @@ public:
   friend class Point;
   friend class Plate;
   friend class Load;
+  friend class Support;
 
   Solver();
-  Solver* current(){ return current_solver;}
+  static Solver* current(){ return current_solver;}
   void parse_input(std::string);
   
+  void run();
   void assemble();
   void solve(MDouble& mat, ADouble& vec);
   
