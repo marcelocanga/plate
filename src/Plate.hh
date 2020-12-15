@@ -25,7 +25,7 @@ protected:
 
   static int ip;
   static double wgt,xr,xs;
-  static double wg[3], xg[3][2];
+  static double wg[3], xg[2][3];
   static ADouble shape,shape_h;
   static MDouble d_shape, d_shape_h;
   static MDouble b_grad, w_grad;

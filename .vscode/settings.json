@@ -1,4 +1,9 @@
 {
+    "cmake.debugConfig": {
+    "args": [
+        "${workspaceFolder}/test/plate.inp"
+    ]
+    },  
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
     "cmake.sourceDirectory": "${workspaceFolder}/.",
     "cmake.configureOnOpen": true,

@@ -6,8 +6,8 @@
 #include "Solver.hh"
 
 
-double Plate::wg[3]={1.0/3.0,1.0/3.0,1.0/3.0};
-double Plate::xg[3][2]={1./6.,2./3.,1./6.,
+double Plate::wg[3]={1.0/6.0,1.0/6.0,1.0/6.0};
+double Plate::xg[2][3]={1./6.,2./3.,1./6.,
                         1./6.,1./6.,2./3.};
 int Plate::ip;
 double Plate::wgt,Plate::xr,Plate::xs;
@@ -100,6 +100,7 @@ void Plate::get_index(int side, int idir, enum IndexType type, AInt& index)
     index(2) = edof_loc[nd2];
     index(3) = edof_loc[nd2+1];
     index(4) = edof_loc[(nnode+nidof+nshear)*eldim+nd1];
+    std::cout<<"Plate::get_index:"<<index<<std::endl;
     break;
   case moment_t:
     index.resize(2);
@@ -230,6 +231,9 @@ void Plate::assemble(){
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 void Plate::potential(){
+  area  = d_zero;
+  fint  = d_zero;
+  stiff = d_zero;
 
   compute_constitutive();
 
@@ -241,6 +245,7 @@ void Plate::potential(){
     Stiffness();
   }
 
+  std::cout<<"Area:"<<area<<std::endl;
 }
 
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -254,8 +259,11 @@ void Plate::potential(){
 
 void Plate::SamplePoint(int integ){
   wgt = wg [integ];
-  xr  = xg[integ][0];
-  xs  = xg[integ][1];
+  xr  = xg[0][integ];
+  xs  = xg[1][integ];
+
+  std::cout<<"integ:"<<integ<<std::endl;
+  std::cout<<"wgt:"<<wgt<<", xr:"<<xr<<", xs:"<<xs<<std::endl;
 }
 
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -336,7 +344,7 @@ void Plate::Shape()
 
 void Plate::Grad(int integ)
 {
-  M2Double xj, xji;
+  M2Double dx, dxi;
   
   Shape();
 
@@ -347,15 +355,15 @@ void Plate::Grad(int integ)
     for(int jj=0; jj<2; jj++){
       double fac = d_zero;
       for(int kk=0; kk<nnode; kk++) fac += d_shape(kk,jj) * point_v[kk]->coor(ii); 
-      xj(ii,jj) = fac;
+      dx(ii,jj) = fac;
     }
 
-  d_area = xj(0,0) * xj(1,1) - xj(1,0) * xj(0,1);
+  d_area = dx(0,0) * dx(1,1) - dx(1,0) * dx(0,1);
 
-  xji(1,1) = xj(0,0)/ d_area;
-  xji(0,0) = xj(1,1)/ d_area;
-  xji(0,1) =-xj(0,1)/ d_area;
-  xji(1,1) =-xj(1,0)/ d_area;
+  dxi(1,1) = dx(0,0)/ d_area;
+  dxi(0,0) = dx(1,1)/ d_area;
+  dxi(0,1) =-dx(0,1)/ d_area;
+  dxi(1,1) =-dx(1,0)/ d_area;
 //
 //*********************************************      bending, Exx,Eyy,Exy
 //
@@ -363,10 +371,10 @@ void Plate::Grad(int integ)
   
   for(int kk=0; kk<4; kk++)
     for(int jj =0; jj<2; jj++){
-      b_grad(0,2*kk+0) += d_shape(kk,jj) * xji(jj,0) ;
-      b_grad(1,2*kk+1) += d_shape(kk,jj) * xji(jj,1) ;
-      b_grad(2,2*kk+0) += 0.5 * d_shape(kk,jj) * xji(jj,0);      
-      b_grad(2,2*kk+1) += 0.5 * d_shape(kk,jj) * xji(jj,1);      
+      b_grad(0,2*kk+0) += d_shape(kk,jj) * dxi(jj,0) ;
+      b_grad(1,2*kk+1) += d_shape(kk,jj) * dxi(jj,1) ;
+      b_grad(2,2*kk+0) += 0.5 * d_shape(kk,jj) * dxi(jj,0);      
+      b_grad(2,2*kk+1) += 0.5 * d_shape(kk,jj) * dxi(jj,1);      
     }
 
 //
@@ -376,23 +384,39 @@ void Plate::Grad(int integ)
 
   for(int kk=0; kk<3; kk++)
     for(int jj =0; jj<2; jj++){
-      w_grad(0,kk+0) +=  d_shape_h(kk,jj) * xji(jj,0);
-      w_grad(1,kk+1) +=  d_shape_h(kk,jj) * xji(jj,1);      
+      w_grad(0,kk) +=  d_shape_h(kk,jj) * dxi(jj,0);
+      w_grad(1,kk) +=  d_shape_h(kk,jj) * dxi(jj,1);      
     }
+//
+//*********************************************      
+//
+  std::cout<<"d_area:"<<d_area<<std::endl;
+  std::cout<<"dx"<<std::endl;
+  std::cout<<dx<<std::endl;
+
+  std::cout<<"dx"<<std::endl;
+  std::cout<<dxi<<std::endl;
+
+  std::cout<<"Shape"<<std::endl;
+  std::cout<<shape<<std::endl;
+
+  std::cout<<"Shape-h"<<std::endl;
+  std::cout<<shape_h<<std::endl;
+
 //
 //*********************************************      done
 //
 }
 
 void Plate::Fint(){
-  int n2     = eldim*(nnode+nidof+nshear);
+  int n2     =  eldim*(nnode+nidof+nshear);
   double fac =  d_area * wgt ;    
   
-  fint      = d_zero;
-
-  for(int mm=0; mm<nedge; mm++)
-    fint(n2 + mm) = fac * shape_h(mm) ;
-
+  area          += fac ;
+  
+  for(int mm=0; mm<nedge; mm++){
+    fint(n2 + mm) += fac * shape_h(mm) ;
+  }
 }
 
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -408,7 +432,7 @@ void Plate::Stiffness(){
 
   double fac = d_area * wgt * thickness;
 
-  stiff = d_zero;
+  if(1 == 2){
 //
 //*********************************************      bending 
 //
@@ -446,6 +470,7 @@ void Plate::Stiffness(){
       stiff(n2+kk,mm)            -= fac * w_grad(kk,mm);
       stiff(mm,           n2+kk) -= fac * w_grad(kk,mm);
     }
+  }
 //
 //*********************************************      done
 //
