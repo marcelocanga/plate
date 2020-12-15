@@ -38,7 +38,9 @@ public:
   friend class Point;
   friend class Solver;
   friend class Load;
-  
+
+  enum IndexType { support_t, moment_t, force_t};
+
   static std::map<std::string, Plate*> plate_m;
   
   Plate();
@@ -57,6 +59,8 @@ public:
 
   void Fint();
   void Stiffness();
+
+  void get_index(int side,int ind, enum IndexType, AInt& index);
 };
 
 

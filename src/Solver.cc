@@ -386,3 +386,23 @@ void Solver::solve(MDouble& mat, ADouble& vec)
 //*********************************************      new from here. Real.
 //
 
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+//
+//               -----  void Solver::add_rhs  -----
+//
+//
+// C: 
+//
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+void Solver::add_rhs(AInt& index, double val)
+{
+  for(int ii=0; ii<index.size(); ii++)
+    rhs(index(ii)) += val;
+}
+
+void Solver::add_lhs(AInt& index, double val)
+{
+  for(int ii=0; ii<index.size(); ii++)
+    lhs(index(ii),index(ii)) += val;
+}

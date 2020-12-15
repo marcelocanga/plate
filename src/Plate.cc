@@ -78,6 +78,41 @@ void Plate::init()
   constitutive_s.dim(2,2);
 }
 
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+//
+//               -----  void Plate::get_index  -----
+//
+//
+// C: 
+//
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+void Plate::get_index(int side, int idir, enum IndexType type, AInt& index)
+{
+  int nd1     =  side;
+  int nd2     = (side+1)%3;
+  
+  switch(type){
+  case support_t:
+    index.resize(5);
+    index(0) = edof_loc[nd1];
+    index(1) = edof_loc[nd1+1];
+    index(2) = edof_loc[nd2];
+    index(3) = edof_loc[nd2+1];
+    index(4) = edof_loc[(nnode+nidof+nshear)*eldim+nd1];
+    break;
+  case moment_t:
+    index.resize(2);
+    index(0) = edof_loc[nd1+idir];
+    index(1) = edof_loc[nd2+idir];
+    break;
+  case force_t:
+    index.resize(1);
+    index(0) = edof_loc[(nnode+nidof+nshear)*eldim+nd1];
+    break;
+  }
+}
+
 
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 //
