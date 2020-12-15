@@ -31,7 +31,7 @@ public:
   void solve(MDouble& mat, ADouble& vec);
 
   void add_rhs(AInt&, double);
-  void add_lhs(AInt&, double);
+  void set_ans(AInt&, double);
   
 };
 

@@ -401,8 +401,14 @@ void Solver::add_rhs(AInt& index, double val)
     rhs(index(ii)) += val;
 }
 
-void Solver::add_lhs(AInt& index, double val)
+void Solver::set_ans(AInt& index, double val)
 {
-  for(int ii=0; ii<index.size(); ii++)
-    lhs(index(ii),index(ii)) += val;
+  for(int ii=0; ii<index.size(); ii++){
+    for(int kk=0; kk<ndof; kk++){
+      lhs(kk,index(ii)) = d_zero;
+      lhs(index(ii),kk) = d_zero;
+    }
+    lhs(index(ii),index(ii)) = d_one;
+    rhs(index(ii))           = val;
+  }
 }

@@ -246,6 +246,7 @@ void Plate::potential(){
   }
 
   std::cout<<"Area:"<<area<<std::endl;
+  std::cout<<"Fint:"<<fint<<std::endl;
 }
 
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -363,7 +364,7 @@ void Plate::Grad(int integ)
   dxi(1,1) = dx(0,0)/ d_area;
   dxi(0,0) = dx(1,1)/ d_area;
   dxi(0,1) =-dx(0,1)/ d_area;
-  dxi(1,1) =-dx(1,0)/ d_area;
+  dxi(1,0) =-dx(1,0)/ d_area;
 //
 //*********************************************      bending, Exx,Eyy,Exy
 //
@@ -394,7 +395,7 @@ void Plate::Grad(int integ)
   std::cout<<"dx"<<std::endl;
   std::cout<<dx<<std::endl;
 
-  std::cout<<"dx"<<std::endl;
+  std::cout<<"dxi"<<std::endl;
   std::cout<<dxi<<std::endl;
 
   std::cout<<"Shape"<<std::endl;
