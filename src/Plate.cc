@@ -34,16 +34,9 @@ MDouble Plate::stiff;
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 Plate::Plate(){
-  static bool is_first = true;
-
-  if(is_first){
-    init();
-    is_first = false;
-  }
-
+  init();
   area   = d_zero;
   d_area = d_zero;
-
 }
 
 
@@ -76,7 +69,6 @@ void Plate::init()
   b_grad.    dim(3,8);
   w_grad.    dim(2,3);
 
-  edof_loc.  dim(ndof);
   fint.      dim(ndof);
   stiff.     dim(ndof,ndof);
 
@@ -94,23 +86,71 @@ void Plate::init()
 //
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-void Plate::count_dof(int& icount)
+void Plate::count_dof(int& ndof)
 {
+  Point* po_pt;
 
-  for(int jj=0;jj<nnode;jj++)
-      for(int kk=0;kk<eldim;kk++)
-	      edof_loc( jj*eldim + kk) = point_v[jj]->pcount_dof(kk,icount);
-
-  for(int jj=0; jj<nedge; jj++)
-      edof_loc(nnode*eldim+jj) = point_v[jj]->pcount_dof(0,icount);
+  for(int jj=0;jj<nnode;jj++){
+    po_pt = point_v[jj];
+    if(po_pt->dof_loc < 0){ 
+      po_pt->dof_loc = ndof;
+      ndof +=2;
+    }
+    edof_loc.push_back(po_pt->dof_loc);
+    edof_loc.push_back(po_pt->dof_loc+1);
+  }
   
-  for(int jj=0; jj<nidof; jj++) edof_loc(nnode*eldim + nedge +jj) = ++icount;
+  for(int ii=0; ii<(nshear+nidof)*eldim; ii++)
+    edof_loc.push_back(ndof+ii);
+  ndof += (nshear+nidof)*eldim;
+
+  for(int jj=0;jj<nedge;jj++){
+    po_pt = point_v[jj+nnode];
+    if(po_pt->dof_loc<0){
+      po_pt->dof_loc = ndof;
+      ndof += 1;
+    }
+    edof_loc.push_back(po_pt->dof_loc);
+  }
+
+std::cout<<"Element dof, name:"<<name<<std::endl;
+for(int ii=0; ii<13; ii++)
+std::cout<<edof_loc[ii]<<" ";
+std::cout<<std::endl;
+
 }
 
 
 
 
 void Plate::add_edge(){
+  
+  Coord coor;
+  Point  po_aux;
+  Point *po_pt;
+
+  std::cout<<"Add Edge: Plate:"<<name<<std::endl;
+
+  for(int ii=0; ii<nnode; ii++){                     // check if there is point with this coord
+    int iie = (ii+1) % nnode;
+    scale(0.5,point_v[ii]->coor,        po_aux.coor);
+    scale(0.5,point_v[iie]->coor, d_one,po_aux.coor);
+
+    if(Point::u_point_s.count(&po_aux)){ 
+      auto it = Point::u_point_s.find(&po_aux);
+      point_v.push_back(*it);
+      std::cout<<"Already found edge: side:"<<iie<<", name:"<<(*it)->name<<std::endl;
+    }
+    else{
+      po_pt = new Point();
+      po_pt->name = Point::new_name();
+      scale(po_aux.coor,po_pt->coor);
+      point_v.push_back(po_pt);
+      Point::u_point_s.insert(po_pt);
+      std::cout<<"New edge: side"<<iie<<", name:"<<po_pt->name<<","<<po_pt->coor<<std::endl;
+    }
+
+  }
 
 }
 

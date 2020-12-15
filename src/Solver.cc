@@ -27,6 +27,7 @@ extern "C"{
 
 Solver::Solver()
 {
+  ndof = 0;
   current_solver = this;
   def_poisson        = 0.3;
   def_young          = 2.e6;
@@ -196,9 +197,14 @@ void Solver::parse_input(std::string file_name){
     case solve_a:{
       ndof = 0;
       std::cout<<"Solver starts."<<std::endl;
+      // add nodes at element edges
       for(auto const& [first,second] : Plate::plate_m) second->add_edge();
+      // count and map equation index
       for(auto const& [first,second] : Plate::plate_m) second->count_dof(ndof);
+      std::cout<<"Ndof:"<<ndof<<std::endl;
+      // assemble stifness matrix and force vector
       assemble();
+      // solve system of equations
       solve(lhs,rhs);
     }
       break;
@@ -215,8 +221,14 @@ void Solver::parse_input(std::string file_name){
 
 void Solver::assemble()
 {
+  lhs.dim(ndof,ndof);
+  rhs.dim(ndof);
+
   for(auto const& [first,second] : Plate::plate_m) second->assemble();
   for(auto const&  first         : Load::load_v)   first->assemble();
+
+  for(int ii=0; ii<29; ii++) lhs(ii,ii) = 2.0;
+  for(int ii=0; ii<29; ii++) rhs(ii)    = 1.0;
 }     
 
 
@@ -248,8 +260,7 @@ void Solver::solve(MDouble& mat, ADouble& vec)
 //
 //*********************************************   
 //
-  std::cout<<"        : rhs  :        "<<std::endl;
-  std::cout<<vec;
+  std::cout<<"        : rhs  :        "<<vec<<std::endl;
   std::cout<<"        : lhs  :        "<<std::endl;
   std::cout<<mat;
   
@@ -286,7 +297,7 @@ void Solver::solve(MDouble& mat, ADouble& vec)
 //*********************************************      
 //
   {
-    std::cout<<"        : guess:        "<<vec;
+    std::cout<<"        : guess:        "<<vec<<std::endl;
   }
 
   if(info > 0){

@@ -21,7 +21,7 @@ protected:
   double poisson, thickness, young;
 
   std::vector<Point*> point_v;
-  AInt edof_loc;
+  std::vector<int>    edof_loc;
 
   static int ip;
   static double wgt,xr,xs;
