@@ -13,8 +13,7 @@ class Support {
 protected:
 
   Plate* el_pt;
-  int eside, gdir;
-  double value;
+  int eside;
   
 public:
   
@@ -25,7 +24,7 @@ public:
   static std::vector<Support*> support_v;
   
   void assemble();
-  void potential();
+
 };
 
 

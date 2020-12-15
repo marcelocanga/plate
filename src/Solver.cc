@@ -165,19 +165,24 @@ void Solver::parse_input(std::string file_name){
 //
     case pressure_a:{
       std::string ename;
-      Load *lo_pt = new Load(Load::pressure_a);
-      iss >> ename >> lo_pt->value;
+      double val;
+      iss >> ename >> val;
 
-      if(Plate::plate_m.count(ename))
-        lo_pt->el_pt = Plate::plate_m[ename];
+      if(ename == "@"){
+	for(auto const& [first,second] : Plate::plate_m){
+	  second->pressure += val;
+	}
+	break;
+      }
+      
+      if(Plate::plate_m.count(ename)){
+	Plate::plate_m[ename]->pressure += val;
+      }
       else{
         std::cout << "Plate in pressure not found:" << ename << std::endl;
         break;
       }
 
-      Load::load_v.push_back(lo_pt);
-
-      std::cout<<"Pressure. Plate:"<<ename  <<", value:"<<lo_pt->value <<std::endl;
     }
       break;
 //.............................................      support
@@ -282,11 +287,15 @@ void Solver::assemble()
 //
 //*********************************************      elements
 //
-  for(auto const& [first,second] : Plate::plate_m) second->assemble();
+  for(auto const& [first,second] : Plate::plate_m)     second->assemble();
 //
 //*********************************************      loads
 //
-  for(auto const&  first         : Load::load_v)   first->assemble();
+  for(auto const&  first         : Load::load_v)       first->assemble();
+//
+//*********************************************      support
+//
+  for(auto const&  first         : Support::support_v) first->assemble();
 //
 //*********************************************      
 //

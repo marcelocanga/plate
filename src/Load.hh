@@ -22,13 +22,12 @@ public:
   friend class Plate;
   friend class Solver;
   
-  enum Type {moment_a,force_a,pressure_a,support_a} type;
+  enum Type {moment_a,force_a} type;
   static std::vector<Load*> load_v;
   
   Load(enum Type _type) : type(_type) {}
 
   void assemble();
-  void potential();
 };
 
 

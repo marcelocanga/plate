@@ -16,7 +16,7 @@ protected:
   std::string name;
   
   int ninteg;
-  double area, d_area;
+  double area, d_area, pressure;
   int nnode,nedge,nidof,nshear,eldim,nedof;
   double poisson, thickness, young;
 

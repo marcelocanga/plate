@@ -8,8 +8,8 @@
 #include "Support.hh"
 
 std::map<std::string, Point*>    Point::point_m;
-std::map<std::string, Plate*>    Plate::plate_m;
 std::set<Point*,LtPoint>         Point::u_point_s;
+std::map<std::string, Plate*>    Plate::plate_m;
 std::vector<Load*>               Load::load_v;
 std::vector<Support*>            Support::support_v;
 

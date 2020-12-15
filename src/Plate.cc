@@ -36,8 +36,9 @@ MDouble Plate::stiff;
 
 Plate::Plate(){
   init();
-  area   = d_zero;
-  d_area = d_zero;
+  area     = d_zero;
+  d_area   = d_zero;
+  pressure = d_zero;
 }
 
 
@@ -178,10 +179,10 @@ void Plate::assemble(){
   potential();
 
   for(int ii=0; ii<nedof; ii++){
-  for(int jj=0; jj<nedof; jj++)
-  Solver::current()->lhs(edof_loc[ii],edof_loc[jj]) += stiff(ii,jj);
-  Solver::current()->rhs(edof_loc[ii])              += fint(ii);
-}
+    for(int jj=0; jj<nedof; jj++)
+      Solver::current()->lhs(edof_loc[ii],edof_loc[jj]) += stiff(ii,jj);
+    Solver::current()->rhs(edof_loc[ii])                += fint(ii);
+  }
 }
 
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -201,6 +202,7 @@ void Plate::potential(){
 
     SamplePoint(ii);
     Grad(ii);
+    Fint();
     Stiffness();
   }
 
@@ -347,7 +349,16 @@ void Plate::Grad(int integ)
 //
 }
 
-void Plate::Fint(){}
+void Plate::Fint(){
+  int n2     = eldim*(nnode+nidof+nshear);
+  double fac =  d_area * wgt ;    
+  
+  fint      = d_zero;
+
+  for(int mm=0; mm<nedge; mm++)
+    fint(n2 + mm) = fac * shape_h(mm) ;
+
+}
 
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 //
@@ -361,6 +372,8 @@ void Plate::Fint(){}
 void Plate::Stiffness(){
 
   double fac = d_area * wgt * thickness;
+
+  stiff = d_zero;
 //
 //*********************************************      bending 
 //
