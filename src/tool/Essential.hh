@@ -59,7 +59,7 @@ extern char str_buffer[nbuffer];
 #define u_diage(x,d)    std::clog<<u_sep<< #x <<" \t: "<<diag.precision(d)<<std::scientific<<x<<std::endl
 #define u_diagf(x,d)    std::clog<<u_sep<< #x <<" \t: "<<std::clog.precision(d)<<std::fixed<<x<<std::endl
 #define u_diagf_h(x,d)  std::clog<<u_sep<< #x <<" \t: "<<std::endl<<std::clog.precision(d)<<std::scientific<<x<<std::endl
-#define u_diag_f        std::clog<<" +++: "<<__FULL_FUNCTION__<<" : "<<std::endl
+#define u_diag_f        std::clog<<" +"<<std::endl<<" +++: "<<__FULL_FUNCTION__<<" : "<<std::endl<<" +"<<std::endl
 //
 //************************************************      
 //

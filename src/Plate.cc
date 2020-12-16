@@ -100,18 +100,18 @@ bool Plate::get_index(int side, int idir, enum IndexType type, AInt& index)
     index(2) = edof_loc[2*nd2];
     index(3) = edof_loc[2*nd2+1];
     index(4) = edof_loc[(nnode+nidof+nshear)*eldim+nd1];
-    std::cout<<"Plate::get_index:support:"<<index<<std::endl;
+    diag_m(diag.echo,"Plate::get_index:support:"<<index<<std::endl);
     break;
   case moment_t:
     index.resize(2);
     index(0) = edof_loc[2*nd1+idir];
     index(1) = edof_loc[2*nd2+idir];
-    std::cout<<"Plate::get_index:moment:"<<index<<std::endl;
+    diag_m(diag.echo,"Plate::get_index:moment:"<<index<<std::endl);
     break;
   case force_t:
     index.resize(1);
     index(0) = edof_loc[(nnode+nidof+nshear)*eldim+nd1];
-    std::cout<<"Plate::get_index:force:"<<index<<std::endl;
+    diag_m(diag.echo,"Plate::get_index:force:"<<index<<std::endl);
     break;
   }
 
@@ -156,10 +156,12 @@ void Plate::count_dof(int& ndof)
     edof_loc.push_back(po_pt->dof_loc);
   }
 
-std::cout<<"Element dof, name:"<<name<<std::endl;
+diag_l(diag.echo,
+std::clog<<"Element dof, name:"<<name<<std::endl;
 for(int ii=0; ii<13; ii++)
-std::cout<<edof_loc[ii]<<" ";
-std::cout<<std::endl;
+std::clog<<edof_loc[ii]<<" ";
+std::clog<<std::endl;
+);
 
 }
 
@@ -181,7 +183,7 @@ void Plate::add_edge(){
   Point  po_aux;
   Point *po_pt;
 
-  std::cout<<"Add Edge: Plate:"<<name<<std::endl;
+  std::clog<<"Add Edge: Plate:"<<name<<std::endl;
 
   for(int ii=0; ii<nnode; ii++){                     // check if there is point with this coord
     int iie = (ii+1) % nnode;
@@ -191,7 +193,7 @@ void Plate::add_edge(){
     if(Point::u_point_s.count(&po_aux)){ 
       auto it = Point::u_point_s.find(&po_aux);
       point_v.push_back(*it);
-      std::cout<<"Already found edge: side:"<<iie<<", name:"<<(*it)->name<<std::endl;
+      std::clog<<"Already found edge: side:"<<iie<<", name:"<<(*it)->name<<std::endl;
     }
     else{
       po_pt = new Point();
@@ -199,7 +201,7 @@ void Plate::add_edge(){
       scale(po_aux.coor,po_pt->coor);
       point_v.push_back(po_pt);
       Point::u_point_s.insert(po_pt);
-      std::cout<<"New edge: side"<<iie<<", name:"<<po_pt->name<<","<<po_pt->coor<<std::endl;
+      std::clog<<"New edge: side"<<iie<<", name:"<<po_pt->name<<","<<po_pt->coor<<std::endl;
     }
 
   }
@@ -250,8 +252,10 @@ void Plate::potential(){
     Stiffness();
   }
 
-  std::cout<<"Area:"<<area<<std::endl;
-  std::cout<<"Fint:"<<fint<<std::endl;
+diag_l(diag.echo,
+  std::clog<<"Area:"<<area<<std::endl;
+  std::clog<<"Fint:"<<fint<<std::endl;
+);
 }
 
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -275,8 +279,10 @@ void Plate::compute_stress(){
     Stress();
   }
 
-  std::cout<<"Area:"<<area<<std::endl;
-  std::cout<<"Fint:"<<fint<<std::endl;
+diag_l(diag.echo,
+  std::clog<<"Area:"<<area<<std::endl;
+  std::clog<<"Fint:"<<fint<<std::endl;
+);
 }
 
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -293,8 +299,10 @@ void Plate::SamplePoint(int integ){
   xr  = xg[0][integ];
   xs  = xg[1][integ];
 
-  std::cout<<"integ:"<<integ<<std::endl;
-  std::cout<<"wgt:"<<wgt<<", xr:"<<xr<<", xs:"<<xs<<std::endl;
+diag_l(diag.debug,
+  std::clog<<"integ:"<<integ<<std::endl;
+  std::clog<<"wgt:"<<wgt<<", xr:"<<xr<<", xs:"<<xs<<std::endl;
+);
 }
 
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -324,9 +332,10 @@ void Plate::compute_constitutive()
   constitutive_s(0,0) = fac2;
   constitutive_s(1,1) = fac2;
 
-  std::cout<<"Constitutive: b"<<constitutive_b<<std::endl;
-  std::cout<<"Constitutive: s"<<constitutive_s<<std::endl;
-  
+diag_l(diag.debug,
+  std::clog<<"Constitutive: b"<<constitutive_b<<std::endl;
+  std::clog<<"Constitutive: s"<<constitutive_s<<std::endl;
+);
 
 }
 
@@ -426,31 +435,31 @@ void Plate::Grad(int integ)
 //*********************************************      
 //
 diag_l(diag.debug,
-  std::cout<<"d_area:"<<d_area<<std::endl;
-  std::cout<<"dx"<<std::endl;
-  std::cout<<dx<<std::endl;
+  std::clog<<"d_area:"<<d_area<<std::endl;
+  std::clog<<"dx"<<std::endl;
+  std::clog<<dx<<std::endl;
 
-  std::cout<<"dxi"<<std::endl;
-  std::cout<<dxi<<std::endl;
+  std::clog<<"dxi"<<std::endl;
+  std::clog<<dxi<<std::endl;
 
-  std::cout<<"Shape"<<std::endl;
-  std::cout<<shape<<std::endl;
+  std::clog<<"Shape"<<std::endl;
+  std::clog<<shape<<std::endl;
 
-  std::cout<<"Shape-h"<<std::endl;
-  std::cout<<shape_h<<std::endl;
+  std::clog<<"Shape-h"<<std::endl;
+  std::clog<<shape_h<<std::endl;
 
-  std::cout<<"d-Shape"<<std::endl;
-  std::cout<<d_shape<<std::endl;
+  std::clog<<"d-Shape"<<std::endl;
+  std::clog<<d_shape<<std::endl;
 
-  std::cout<<"d-Shape-h"<<std::endl;
-  std::cout<<d_shape_h<<std::endl;
+  std::clog<<"d-Shape-h"<<std::endl;
+  std::clog<<d_shape_h<<std::endl;
 
 
-  std::cout<<"Curvature"<<std::endl;
-  std::cout<<b_grad<<std::endl;
+  std::clog<<"Curvature"<<std::endl;
+  std::clog<<b_grad<<std::endl;
 
-  std::cout<<"w-gradient"<<std::endl;
-  std::cout<<w_grad<<std::endl;
+  std::clog<<"w-gradient"<<std::endl;
+  std::clog<<w_grad<<std::endl;
 );
 //
 //*********************************************      done
@@ -509,7 +518,6 @@ void Plate::Stiffness(){
 //
 //*********************************************      constraints shear,bending
 //
-  if(1 == 2){
   for(int mm=0; mm<ncons; mm++)
       for(int kk=0; kk<nshear*eldim; kk++){
 	stiff(ncons*eldim+kk,mm*2+0)            += fac * shape(mm);
@@ -528,7 +536,6 @@ void Plate::Stiffness(){
       stiff(n2+kk,mm)            -= fac * w_grad(kk,mm);
       stiff(mm,           n2+kk) -= fac * w_grad(kk,mm);
     }
-  }
 //
 //*********************************************      done
 //

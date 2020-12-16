@@ -93,7 +93,7 @@ void Solver::parse_input(std::string file_name){
       iss >> po_pt->name;
       iss >> po_pt->coor(0) >> po_pt->coor(1) >> po_pt->coor(2) ;
       Point::point_m[po_pt->name] = po_pt;
-      std::cout<<"Point:"<<po_pt->name<<":"<<po_pt->coor(0)<<","<<po_pt->coor(1)<<","<<po_pt->coor(2)<<std::endl;
+      diag_m(diag.info,"Point:"<<po_pt->name<<":"<<po_pt->coor(0)<<","<<po_pt->coor(1)<<","<<po_pt->coor(2)<<std::endl);
     }
       break;
 //.............................................      plate
@@ -111,7 +111,7 @@ void Solver::parse_input(std::string file_name){
           el_pt->point_v.push_back(Point::point_m[nam]);
         else
         {
-          std::cout << "Point in plate not found:" << nam << ", plate" << el_pt->name << std::endl;
+          diag_m(diag.error, "Point in plate not found:" << nam << ", plate" << el_pt->name << std::endl);
           break;
         }
       }
@@ -121,7 +121,7 @@ void Solver::parse_input(std::string file_name){
       el_pt->young = def_young;
       el_pt->thickness = def_thickness;
 
-      std::cout<<"Plate:"<<el_pt->name<<","<<point[0]<<","<<point[1]<<","<<point[2]<<std::endl;
+      diag_m(diag.info,"Plate:"<<el_pt->name<<","<<point[0]<<","<<point[1]<<","<<point[2]<<std::endl);
     }
       break;
 //.............................................      shear force
@@ -137,17 +137,18 @@ void Solver::parse_input(std::string file_name){
       if(Plate::plate_m.count(ename))
         lo_pt->el_pt = Plate::plate_m[ename];
       else{
-        std::cout << "Plate in force not found:" << ename << std::endl;
+        diag_m(diag.error,"Plate in force not found:" << ename << std::endl);
         break;
       }
 
       Load::load_v.push_back(lo_pt);
 
-      if (token == force_a)
-        std::cout<<"Force. Plate:"<<ename <<", side:"<<lo_pt->eside <<", value:"<<lo_pt->value <<std::endl;
-      else
-        std::cout<<"Line Force. Plate:"<<ename <<", side:"<<lo_pt->eside <<", value:"<<lo_pt->value <<std::endl;
-
+      if (token == force_a){
+        diag_m(diag.info,"Force. Plate:"<<ename <<", side:"<<lo_pt->eside <<", value:"<<lo_pt->value <<std::endl);
+      }
+      else{
+        diag_m(diag.info,"Line Force. Plate:"<<ename <<", side:"<<lo_pt->eside <<", value:"<<lo_pt->value <<std::endl);
+      }
     }
       break;
 //.............................................      moment
@@ -162,13 +163,13 @@ void Solver::parse_input(std::string file_name){
       if(Point::point_m.count(pname))
         lo_pt->po_pt = Point::point_m[pname];
       else{
-        std::cout << "Point in moment not found:" << pname << std::endl;
+        diag_m(diag.error,"Point in moment not found:" << pname << std::endl);
         break;
       }
 
       Load::load_v.push_back(lo_pt);
 
-      std::cout<<"Moment. Point:"<<pname <<", dir:"<<lo_pt->gdir<<", value:"<<lo_pt->value<<std::endl;
+      diag_m(diag.info,"Moment. Point:"<<pname <<", dir:"<<lo_pt->gdir<<", value:"<<lo_pt->value<<std::endl);
 }
       break;
 //.............................................      line moment
@@ -183,13 +184,13 @@ void Solver::parse_input(std::string file_name){
       if(Plate::plate_m.count(ename))
         lo_pt->el_pt = Plate::plate_m[ename];
       else{
-        std::cout << "Plate in line moment not found:" << ename << std::endl;
+        diag_m(diag.error,"Plate in line moment not found:" << ename << std::endl);
         break;
       }
 
       Load::load_v.push_back(lo_pt);
 
-      std::cout<<"Line Moment. Plate:"<<ename <<", side:"<<lo_pt->eside <<", dir:"<<lo_pt->gdir<<", value:"<<lo_pt->value<<std::endl;
+      diag_m(diag.info,"Line Moment. Plate:"<<ename <<", side:"<<lo_pt->eside <<", dir:"<<lo_pt->gdir<<", value:"<<lo_pt->value<<std::endl);
 }
       break;
 //.............................................      pressure
@@ -210,10 +211,10 @@ void Solver::parse_input(std::string file_name){
 	Plate::plate_m[ename]->pressure += val;
       }
       else{
-        std::cout << "Plate in pressure not found:" << ename << std::endl;
+        diag_m(diag.error,"Plate in pressure not found:" << ename << std::endl);
         break;
       }
-
+      diag_m(diag.info,"Plate Pressure in:"<<ename<<", val:"<<val<<std::endl);
     }
       break;
 //.............................................      support
@@ -226,30 +227,30 @@ void Solver::parse_input(std::string file_name){
       if(Plate::plate_m.count(ename))
         su_pt->el_pt = Plate::plate_m[ename];
       else{
-        std::cout << "Plate in support not found:" << ename << std::endl;
+        diag_m(diag.error,"Plate in support not found:" << ename << std::endl);
         break;
       }
 
       Support::support_v.push_back(su_pt);
 
-      std::cout<<"Fix Support. Plate:"<<ename <<", side:"<<su_pt->eside <<std::endl;
+      diag_m(diag.info,"Fix Support. Plate:"<<ename <<", side:"<<su_pt->eside <<std::endl);
     }
       break;
 //.............................................      material properties/thickness
 //
     case thickness_a:
       iss >> def_thickness;
-      std::cout<<"Plate thickness:"<<def_thickness<<std::endl;
+      diag_m(diag.info,"Plate thickness:"<<def_thickness<<std::endl);
       break;
       
     case young_a:
       iss >> def_young;
-      std::cout<<"Young's modulus:"<<def_young<<std::endl;
+      diag_m(diag.info,"Young's modulus:"<<def_young<<std::endl);
       break;
 
     case poisson_a:
       iss >> def_poisson;
-      std::cout<<"Poisson's ratio:"<<def_poisson<<std::endl;
+      diag_m(diag.info,"Poisson's ratio:"<<def_poisson<<std::endl);
       break;
 //.............................................      
 //
@@ -287,7 +288,7 @@ void Solver::parse_input(std::string file_name){
 void Solver::run()
 {
   ndof = 0;
-  std::cout<<"Solver starts."<<std::endl;
+  diag_m(diag.info,"Solver starts."<<std::endl);
 //
 //*********************************************     add nodes at element edges 
 //
@@ -296,7 +297,7 @@ void Solver::run()
 //*********************************************      count and map equation index
 //
   for(auto const& [first,second] : Plate::plate_m) second->count_dof(ndof);
-  std::cout<<"Ndof:"<<ndof<<std::endl;
+  diag_m(diag.info,"Ndof:"<<ndof<<std::endl);
 //
 //*********************************************      assemble stifness matrix and force vector
 //
@@ -391,7 +392,7 @@ void Solver::solve(MDouble& mat, ADouble& vec)
     double aux;
 
     if(nrow != ncol)
-      diag_mesg(diag.error,"SlvDenseLU::solve: Matrix is not square:"<<std::endl);
+      diag_m(diag.error,"SlvDenseLU::solve: Matrix is not square:"<<std::endl);
 
     for (int ii = 0; ii < nrow; ii++)
       for (int jj = ii; jj < ncol; jj++)
@@ -422,7 +423,7 @@ void Solver::solve(MDouble& mat, ADouble& vec)
   }
 
   if(info > 0){
-    diag_mesg(diag.error,"SlvDenseLu::dposv: Solver error. Error num:"<<info<<std::endl);
+    diag_m(diag.error,"SlvDenseLu::dposv: Solver error. Error num:"<<info<<std::endl);
   }
 }
 //
