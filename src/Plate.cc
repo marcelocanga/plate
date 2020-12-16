@@ -4,7 +4,7 @@
 #include "Essential.hh"
 #include "Array.hh"
 #include "Solver.hh"
-
+#include "Diagnostic.hh"
 
 double Plate::wg[3]={1.0/6.0,1.0/6.0,1.0/6.0};
 double Plate::xg[2][3]={1./6.,2./3.,1./6.,
@@ -87,31 +87,36 @@ void Plate::init()
 //
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-void Plate::get_index(int side, int idir, enum IndexType type, AInt& index)
+bool Plate::get_index(int side, int idir, enum IndexType type, AInt& index)
 {
-  int nd1     =  side;
-  int nd2     = (side+1)%3;
-  
+  int nd1     =   side;
+  int nd2     =  (side+1)%3;
+
   switch(type){
   case support_t:
     index.resize(5);
-    index(0) = edof_loc[nd1];
-    index(1) = edof_loc[nd1+1];
-    index(2) = edof_loc[nd2];
-    index(3) = edof_loc[nd2+1];
+    index(0) = edof_loc[2*nd1];
+    index(1) = edof_loc[2*nd1+1];
+    index(2) = edof_loc[2*nd2];
+    index(3) = edof_loc[2*nd2+1];
     index(4) = edof_loc[(nnode+nidof+nshear)*eldim+nd1];
-    std::cout<<"Plate::get_index:"<<index<<std::endl;
+    std::cout<<"Plate::get_index:support:"<<index<<std::endl;
     break;
   case moment_t:
     index.resize(2);
-    index(0) = edof_loc[nd1+idir];
-    index(1) = edof_loc[nd2+idir];
+    index(0) = edof_loc[2*nd1+idir];
+    index(1) = edof_loc[2*nd2+idir];
+    std::cout<<"Plate::get_index:moment:"<<index<<std::endl;
     break;
   case force_t:
     index.resize(1);
     index(0) = edof_loc[(nnode+nidof+nshear)*eldim+nd1];
+    std::cout<<"Plate::get_index:force:"<<index<<std::endl;
     break;
   }
+
+  return true;
+  
 }
 
 
@@ -251,6 +256,31 @@ void Plate::potential(){
 
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 //
+//               -----  void Plate::stress  -----
+//
+//
+// C: 
+//
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+void Plate::compute_stress(){
+  area  = d_zero;
+
+  compute_constitutive();
+
+  for(int ii=0; ii<ninteg; ii++){
+
+    SamplePoint(ii);
+    Grad(ii);
+    Stress();
+  }
+
+  std::cout<<"Area:"<<area<<std::endl;
+  std::cout<<"Fint:"<<fint<<std::endl;
+}
+
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+//
 //               -----  void Plate::SamplePoint  -----
 //
 //
@@ -285,14 +315,18 @@ void Plate::compute_constitutive()
   constitutive_b = d_zero;
 
   constitutive_b(0,0) = fac1;
-  constitutive_b(0,1) = fac1 * poisson ; 
-  constitutive_b(1,0) = fac1;
-  constitutive_b(1,1) = fac1 * poisson;
+  constitutive_b(0,1) = fac1 * poisson; 
+  constitutive_b(1,0) = fac1 * poisson;
+  constitutive_b(1,1) = fac1;
   constitutive_b(2,2) = fac1 * (d_one - poisson) / 2.0;
 
   constitutive_s      = d_zero;
   constitutive_s(0,0) = fac2;
   constitutive_s(1,1) = fac2;
+
+  std::cout<<"Constitutive: b"<<constitutive_b<<std::endl;
+  std::cout<<"Constitutive: s"<<constitutive_s<<std::endl;
+  
 
 }
 
@@ -361,10 +395,10 @@ void Plate::Grad(int integ)
 
   d_area = dx(0,0) * dx(1,1) - dx(1,0) * dx(0,1);
 
-  dxi(1,1) = dx(0,0)/ d_area;
-  dxi(0,0) = dx(1,1)/ d_area;
-  dxi(0,1) =-dx(0,1)/ d_area;
-  dxi(1,0) =-dx(1,0)/ d_area;
+  dxi(1,1) =  dx(0,0) / d_area;
+  dxi(0,0) =  dx(1,1) / d_area;
+  dxi(0,1) = -dx(0,1) / d_area;
+  dxi(1,0) = -dx(1,0) / d_area;
 //
 //*********************************************      bending, Exx,Eyy,Exy
 //
@@ -372,10 +406,10 @@ void Plate::Grad(int integ)
   
   for(int kk=0; kk<4; kk++)
     for(int jj =0; jj<2; jj++){
-      b_grad(0,2*kk+0) += d_shape(kk,jj) * dxi(jj,0) ;
-      b_grad(1,2*kk+1) += d_shape(kk,jj) * dxi(jj,1) ;
-      b_grad(2,2*kk+0) += 0.5 * d_shape(kk,jj) * dxi(jj,0);      
-      b_grad(2,2*kk+1) += 0.5 * d_shape(kk,jj) * dxi(jj,1);      
+      b_grad(0,2*kk+0) +=       d_shape(kk,jj) * dxi(jj,0) ;
+      b_grad(1,2*kk+1) +=       d_shape(kk,jj) * dxi(jj,1) ;
+      b_grad(2,2*kk+1) += 0.5 * d_shape(kk,jj) * dxi(jj,0);      
+      b_grad(2,2*kk+0) += 0.5 * d_shape(kk,jj) * dxi(jj,1);      
     }
 
 //
@@ -391,6 +425,7 @@ void Plate::Grad(int integ)
 //
 //*********************************************      
 //
+diag_l(diag.debug,
   std::cout<<"d_area:"<<d_area<<std::endl;
   std::cout<<"dx"<<std::endl;
   std::cout<<dx<<std::endl;
@@ -404,10 +439,32 @@ void Plate::Grad(int integ)
   std::cout<<"Shape-h"<<std::endl;
   std::cout<<shape_h<<std::endl;
 
+  std::cout<<"d-Shape"<<std::endl;
+  std::cout<<d_shape<<std::endl;
+
+  std::cout<<"d-Shape-h"<<std::endl;
+  std::cout<<d_shape_h<<std::endl;
+
+
+  std::cout<<"Curvature"<<std::endl;
+  std::cout<<b_grad<<std::endl;
+
+  std::cout<<"w-gradient"<<std::endl;
+  std::cout<<w_grad<<std::endl;
+);
 //
 //*********************************************      done
 //
 }
+
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+//
+//               -----  void Plate::Fint  -----
+//
+//
+// C: pressure forces on the plate face, and area calc
+//
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 void Plate::Fint(){
   int n2     =  eldim*(nnode+nidof+nshear);
@@ -425,7 +482,7 @@ void Plate::Fint(){
 //               -----  void Plate::Stiffness  -----
 //
 //
-// C: stiffness matrix
+// C: stiffness matrix, 
 //
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
@@ -433,7 +490,6 @@ void Plate::Stiffness(){
 
   double fac = d_area * wgt * thickness;
 
-  if(1 == 2){
 //
 //*********************************************      bending 
 //
@@ -453,6 +509,7 @@ void Plate::Stiffness(){
 //
 //*********************************************      constraints shear,bending
 //
+  if(1 == 2){
   for(int mm=0; mm<ncons; mm++)
       for(int kk=0; kk<nshear*eldim; kk++){
 	stiff(ncons*eldim+kk,mm*2+0)            += fac * shape(mm);
@@ -472,6 +529,45 @@ void Plate::Stiffness(){
       stiff(mm,           n2+kk) -= fac * w_grad(kk,mm);
     }
   }
+//
+//*********************************************      done
+//
+}
+
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+//
+//               -----  void Plate::Stress  -----
+//
+//
+// C: Compute stresses at integration points
+//
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
+void Plate::Stress(){
+  
+  ADouble bending(8);
+  ADouble shear(2);
+
+  int ncons = nnode+nidof;
+//
+//*********************************************      
+//
+  for(int ii=0; ii<ncons*eldim; ii++)
+    bending(ii) = Solver::current()->rhs(ii);
+  for(int ii=0; ii<2; ii++)
+    bending(ii) = Solver::current()->rhs(ncons*eldim+ii);  
+//
+//*********************************************      bending 
+//
+  for(int mm=0; mm<ncons*eldim; mm++)
+    for(int ii=0; ii<3; ii++)
+      for(int jj=0; jj<3; jj++)
+	bending(ii)   += thickness * constitutive_b(ii,jj)*b_grad(jj,mm)*bending(mm) ;
+//
+//*********************************************      shear
+//
+  for(int nn=0; nn<2; nn++)
+    shear(nn)         += thickness *  constitutive_s(nn,nn)*shear(nn);
 //
 //*********************************************      done
 //

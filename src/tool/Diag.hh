@@ -14,7 +14,7 @@ class Ostring;
 class Analyzer;
 class String;
 
-extern Diag diag;
+//extern Diag diag;
 //
 //************************************************      
 //

@@ -25,6 +25,7 @@ public:
   friend class Load;
 
   Point();
+  bool get_index(int,AInt&);
 
   static std::map<std::string, Point*> point_m;
   static std::set<Point*,LtPoint>      u_point_s;

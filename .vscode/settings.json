@@ -1,7 +1,7 @@
 {
     "cmake.debugConfig": {
     "args": [
-        "${workspaceFolder}/test/plate.inp"
+        "${workspaceFolder}/example/3-plate.inp"
     ]
     },  
     "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",

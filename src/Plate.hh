@@ -60,7 +60,10 @@ public:
   void Fint();
   void Stiffness();
 
-  void get_index(int side,int ind, enum IndexType, AInt& index);
+  bool get_index(int side,int ind, enum IndexType, AInt& index);
+
+  void compute_stress();
+  void Stress();
 };
 
 

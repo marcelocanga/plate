@@ -2,6 +2,7 @@
 #include "Load.hh"
 #include "Solver.hh"
 #include "Support.hh"
+#include "Diagnostic.hh"
 
 extern "C"{      // Lapack solvers
   //#include "Blas.h"
@@ -51,7 +52,7 @@ Solver::Solver()
 void Solver::parse_input(std::string file_name){
   
   enum { point_a,plate_a,force_a,moment_a,pressure_a,support_a,solve_a,young_a,
-         poisson_a, thickness_a, end_a };
+         poisson_a, thickness_a, end_a, line_force_a, line_moment_a, diagnostic_a };
   int token = end_a;
 
   std::string line;
@@ -70,12 +71,15 @@ void Solver::parse_input(std::string file_name){
     else if (line.find("*plat")   != std::string::npos) token = plate_a;
     else if (line.find("*forc")   != std::string::npos) token = force_a;
     else if (line.find("*mome")   != std::string::npos) token = moment_a;
+    else if (line.find("*lfor")   != std::string::npos) token = line_force_a;
+    else if (line.find("*lmom")   != std::string::npos) token = line_moment_a;
     else if (line.find("*pres")   != std::string::npos) token = pressure_a;
     else if (line.find("*supp")   != std::string::npos) token = support_a;
     else if (line.find("*solv")   != std::string::npos) token = solve_a;    
     else if (line.find("*youn")   != std::string::npos) token = young_a;    
     else if (line.find("*pois")   != std::string::npos) token = poisson_a;    
     else if (line.find("*thic")   != std::string::npos) token = thickness_a;    
+    else if (line.find("*diag")   != std::string::npos) token = diagnostic_a;
     else if (line.find("*end")    != std::string::npos) break;
     else is_continue = false;
     
@@ -122,43 +126,70 @@ void Solver::parse_input(std::string file_name){
       break;
 //.............................................      shear force
 //
+    case line_force_a:
     case force_a:{
       std::string ename;
-      Load *lo_pt = new Load(Load::force_a);
+      Load *lo_pt;
+      if (token == force_a) lo_pt = new Load(Load::force_a);
+      else                  lo_pt = new Load(Load::line_force_a);
       iss >> ename >>lo_pt->eside >> lo_pt->value;
 
       if(Plate::plate_m.count(ename))
         lo_pt->el_pt = Plate::plate_m[ename];
       else{
-        std::cout << "Plate in load force not found:" << ename << std::endl;
+        std::cout << "Plate in force not found:" << ename << std::endl;
         break;
       }
 
       Load::load_v.push_back(lo_pt);
 
-      std::cout<<"Shear Force. Plate:"<<ename <<", side:"<<lo_pt->eside <<", value:"<<lo_pt->value <<std::endl;
+      if (token == force_a)
+        std::cout<<"Force. Plate:"<<ename <<", side:"<<lo_pt->eside <<", value:"<<lo_pt->value <<std::endl;
+      else
+        std::cout<<"Line Force. Plate:"<<ename <<", side:"<<lo_pt->eside <<", value:"<<lo_pt->value <<std::endl;
+
     }
       break;
 //.............................................      moment
 //
     case moment_a:{
       int gdir;
-      std::string ename;
+      std::string pname;
       Load *lo_pt = new Load(Load::moment_a);
       
-      iss >> ename >>lo_pt->eside >> gdir >> lo_pt->value;
-      lo_pt->gdir = gdir-1;  // index from 0
+      iss >> pname >> lo_pt->gdir >> lo_pt->value;
 
-      if(Plate::plate_m.count(ename))
-        lo_pt->el_pt = Plate::plate_m[ename];
+      if(Point::point_m.count(pname))
+        lo_pt->po_pt = Point::point_m[pname];
       else{
-        std::cout << "Plate in load moment not found:" << ename << std::endl;
+        std::cout << "Point in moment not found:" << pname << std::endl;
         break;
       }
 
       Load::load_v.push_back(lo_pt);
 
-      std::cout<<"Bending Moment Load. Plate:"<<ename <<", side:"<<lo_pt->eside <<", dir:"<<gdir<<", value:"<<lo_pt->value<<std::endl;
+      std::cout<<"Moment. Point:"<<pname <<", dir:"<<lo_pt->gdir<<", value:"<<lo_pt->value<<std::endl;
+}
+      break;
+//.............................................      line moment
+//
+    case line_moment_a:{
+      int gdir;
+      std::string ename;
+      Load *lo_pt = new Load(Load::line_moment_a);
+      
+      iss >> ename >>lo_pt->eside >> lo_pt->gdir >> lo_pt->value;
+
+      if(Plate::plate_m.count(ename))
+        lo_pt->el_pt = Plate::plate_m[ename];
+      else{
+        std::cout << "Plate in line moment not found:" << ename << std::endl;
+        break;
+      }
+
+      Load::load_v.push_back(lo_pt);
+
+      std::cout<<"Line Moment. Plate:"<<ename <<", side:"<<lo_pt->eside <<", dir:"<<lo_pt->gdir<<", value:"<<lo_pt->value<<std::endl;
 }
       break;
 //.............................................      pressure
@@ -201,7 +232,7 @@ void Solver::parse_input(std::string file_name){
 
       Support::support_v.push_back(su_pt);
 
-      std::cout<<"Fix Support Condition. Plate:"<<ename <<", side:"<<su_pt->eside <<std::endl;
+      std::cout<<"Fix Support. Plate:"<<ename <<", side:"<<su_pt->eside <<std::endl;
     }
       break;
 //.............................................      material properties/thickness
@@ -219,6 +250,14 @@ void Solver::parse_input(std::string file_name){
     case poisson_a:
       iss >> def_poisson;
       std::cout<<"Poisson's ratio:"<<def_poisson<<std::endl;
+      break;
+//.............................................      
+//
+    case diagnostic_a:{
+      int level;
+      iss >> level;
+      diag.set_level(level);
+    }
       break;
 //.............................................      solver
 //
@@ -266,6 +305,10 @@ void Solver::run()
 //*********************************************      solve system of equations
 //
   solve(lhs,rhs);
+//
+//*********************************************      done
+//
+  for(auto const& [first,second] : Plate::plate_m) second->compute_stress();
 //
 //*********************************************      done
 //
