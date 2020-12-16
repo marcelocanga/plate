@@ -364,7 +364,7 @@ void Solver::assemble()
 void Solver::solve(MDouble& mat, ADouble& vec)
 {
   bool is_transpose = true;       // transpose for c to fortran compatibility
-  bool is_symmetric = true;       // info on upper triangle is required. 
+  bool is_symmetric = false;       // info on upper triangle is required. 
                                   // if lower triangle is given, transpose is not necessary
   
   char uplo='U';

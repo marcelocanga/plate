@@ -529,12 +529,13 @@ void Plate::Stiffness(){
 //*********************************************      constrains shear, grad displ
 //
 
+  int n3 = eldim*ncons;
   int n2 = eldim*(ncons+nshear);
   
   for(int mm=0; mm<nedge; mm++)
     for(int kk=0; kk<2; kk++){
-      stiff(n2+kk,mm)            -= fac * w_grad(kk,mm);
-      stiff(mm,           n2+kk) -= fac * w_grad(kk,mm);
+      stiff(n3+kk,mm+n2)         -= fac * w_grad(kk,mm);
+      stiff(mm+n2,        n3+kk) -= fac * w_grad(kk,mm);
     }
 //
 //*********************************************      done
