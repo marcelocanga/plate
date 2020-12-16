@@ -117,8 +117,8 @@ void Solver::parse_input(std::string file_name){
       }
       Plate::plate_m[el_pt->name] = el_pt;
 
-      el_pt->poisson = def_poisson;
-      el_pt->young = def_young;
+      el_pt->poisson   = def_poisson;
+      el_pt->young     = def_young;
       el_pt->thickness = def_thickness;
 
       diag_m(diag.info,"Plate:"<<el_pt->name<<","<<point[0]<<","<<point[1]<<","<<point[2]<<std::endl);
