@@ -14,6 +14,18 @@ public:
   Diagnostic();
   bool level(enum DiagLevel);
   void set_level(int);
+
+//
+//************************************************      operators
+//
+  template< class T>
+
+  Diagnostic& operator<<(T& p){
+    std::clog<<p;
+    return *this; 
+  }
+  Diagnostic& operator<<(std::ostream& omanip(std::ostream &));
+
 };
 
 

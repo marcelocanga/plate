@@ -56,3 +56,8 @@ void Diagnostic::set_level(int level)
   }
   diag_level = DiagLevel(level);
 }
+
+Diagnostic& Diagnostic::operator<<(std::ostream& omanip(std::ostream &)){
+      omanip(std::clog);
+  return *this; 
+}

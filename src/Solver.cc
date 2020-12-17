@@ -381,10 +381,11 @@ void Solver::solve(MDouble& mat, ADouble& vec)
 //
 //*********************************************   
 //
-  std::cout<<"        : rhs  :        "<<vec<<std::endl;
-  std::cout<<"        : lhs  :        "<<std::endl;
-  std::cout<<std::setprecision(9)<<mat;
-  
+diag_l(diag.echo,
+  diag<<"        : rhs  :        "<<vec<<std::endl;
+  diag<<"        : lhs  :        "<<std::endl;
+  diag<<mat;
+);
 //
 //*********************************************      self trasnpose
 //
@@ -418,9 +419,9 @@ void Solver::solve(MDouble& mat, ADouble& vec)
 //
 //*********************************************      
 //
-  {
-    std::cout<<"        : guess:        "<<vec<<std::endl;
-  }
+  diag_l(diag.echo,
+    diag<<"        : guess:        "<<vec<<std::endl;
+  );
 
   if(info > 0){
     diag_m(diag.error,"SlvDenseLu::dposv: Solver error. Error num:"<<info<<std::endl);

@@ -162,10 +162,10 @@ void Plate::count_dof(int& ndof)
   }
 
 diag_l(diag.echo,
-std::clog<<"Element dof, name:"<<name<<std::endl;
-for(int ii=0; ii<13; ii++)
-std::clog<<edof_loc[ii]<<" ";
-std::clog<<std::endl;
+  diag<<"Element dof, name:"<<name<<std::endl;
+  for(int ii=0; ii<13; ii++)
+  diag<<edof_loc[ii]<<" ";
+  diag<<std::endl;
 );
 
 }
@@ -188,7 +188,7 @@ void Plate::add_edge(){
   Point  po_aux;
   Point *po_pt;
 
-  std::clog<<"Add Edge: Plate:"<<name<<std::endl;
+  diag_m(diag.echo,"Add Edge: Plate:"<<name<<std::endl);
 
   for(int ii=0; ii<nnode; ii++){                     // check if there is point with this coord
     int iie = (ii+1) % nnode;
@@ -198,7 +198,7 @@ void Plate::add_edge(){
     if(Point::u_point_s.count(&po_aux)){ 
       auto it = Point::u_point_s.find(&po_aux);
       point_v.push_back(*it);
-      std::clog<<"Already found edge: side:"<<iie<<", name:"<<(*it)->name<<std::endl;
+      diag_m(diag.echo,"Already found edge: side:"<<iie<<", name:"<<(*it)->name<<std::endl);
     }
     else{
       po_pt = new Point();
@@ -206,7 +206,7 @@ void Plate::add_edge(){
       scale(po_aux.coor,po_pt->coor);
       point_v.push_back(po_pt);
       Point::u_point_s.insert(po_pt);
-      std::clog<<"New edge: side"<<iie<<", name:"<<po_pt->name<<","<<po_pt->coor<<std::endl;
+      diag_m(diag.echo,"New edge: side"<<iie<<", name:"<<po_pt->name<<","<<po_pt->coor<<std::endl);
     }
 
   }
@@ -258,8 +258,8 @@ void Plate::potential(){
   }
 
 diag_l(diag.echo,
-  std::clog<<"Area:"<<area<<std::endl;
-  std::clog<<"Fint:"<<fint<<std::endl;
+  diag<<"Area:"<<area<<std::endl;
+  diag<<"Fint:"<<fint<<std::endl;
 );
 }
 
@@ -285,8 +285,8 @@ void Plate::compute_stress(){
   }
 
 diag_l(diag.echo,
-  std::clog<<"Area:"<<area<<std::endl;
-  std::clog<<"Fint:"<<fint<<std::endl;
+  diag<<"Area:"<<area<<std::endl;
+  diag<<"Fint:"<<fint<<std::endl;
 );
 }
 
@@ -305,8 +305,8 @@ void Plate::SamplePoint(int integ){
   xs  = xg[1][integ];
 
 diag_l(diag.debug,
-  std::clog<<"integ:"<<integ<<std::endl;
-  std::clog<<"wgt:"<<wgt<<", xr:"<<xr<<", xs:"<<xs<<std::endl;
+  diag<<"integ:"<<integ<<std::endl;
+  diag<<"wgt:"<<wgt<<", xr:"<<xr<<", xs:"<<xs<<std::endl;
 );
 }
 
@@ -338,8 +338,8 @@ void Plate::compute_constitutive()
   constitutive_s(1,1) = fac2;
 
 diag_l(diag.debug,
-  std::clog<<"Constitutive: b"<<constitutive_b<<std::endl;
-  std::clog<<"Constitutive: s"<<constitutive_s<<std::endl;
+  diag<<"Constitutive: b"<<constitutive_b<<std::endl;
+  diag<<"Constitutive: s"<<constitutive_s<<std::endl;
 );
 
 }
@@ -440,31 +440,31 @@ void Plate::Grad(int integ)
 //*********************************************      
 //
 diag_l(diag.debug,
-  std::clog<<"d_area:"<<d_area<<std::endl;
-  std::clog<<"dx"<<std::endl;
-  std::clog<<dx<<std::endl;
+  diag<<"d_area:"<<d_area<<std::endl;
+  diag<<"dx"<<std::endl;
+  diag<<dx<<std::endl;
 
-  std::clog<<"dxi"<<std::endl;
-  std::clog<<dxi<<std::endl;
+  diag<<"dxi"<<std::endl;
+  diag<<dxi<<std::endl;
 
-  std::clog<<"Shape"<<std::endl;
-  std::clog<<shape<<std::endl;
+  diag<<"Shape"<<std::endl;
+  diag<<shape<<std::endl;
 
-  std::clog<<"Shape-h"<<std::endl;
-  std::clog<<shape_h<<std::endl;
+  diag<<"Shape-h"<<std::endl;
+  diag<<shape_h<<std::endl;
 
-  std::clog<<"d-Shape"<<std::endl;
-  std::clog<<d_shape<<std::endl;
+  diag<<"d-Shape"<<std::endl;
+  diag<<d_shape<<std::endl;
 
-  std::clog<<"d-Shape-h"<<std::endl;
-  std::clog<<d_shape_h<<std::endl;
+  diag<<"d-Shape-h"<<std::endl;
+  diag<<d_shape_h<<std::endl;
 
 
-  std::clog<<"Curvature"<<std::endl;
-  std::clog<<b_grad<<std::endl;
+  diag<<"Curvature"<<std::endl;
+  diag<<b_grad<<std::endl;
 
-  std::clog<<"w-gradient"<<std::endl;
-  std::clog<<w_grad<<std::endl;
+  diag<<"w-gradient"<<std::endl;
+  diag<<w_grad<<std::endl;
 );
 //
 //*********************************************      done
@@ -583,48 +583,4 @@ void Plate::Stress(){
 //*********************************************      done
 //
 }
-
-  
-//    for(int mm=0; mm<nnode*eldim; mm++)
-//      for(int kk=0; kk<nalfa; kk++){
-//	stiff(nnode*eldim+kk,mm)            += shapeh(kk)*d_stretch[0](mm) *iso_jacob*wgt;
-//	stiff(mm,           nnode*eldim+kk) += shapeh(kk)*d_stretch[0](mm) *iso_jacob*wgt;
-//      }
-
-
-//      for(int mm=0; mm<nalfa; mm++)
-//	for(int kk=0; kk<nalfa; kk++)
-//	  stiff(nnode*eldim+kk,nnode*eldim+mm) -= shapeh(kk)*shapeh(mm)*elastic*iso_jacob*wgt;
-
-  
-//    for(int mm=0; mm<nnode*eldim; mm++)
-//      for(int kk=0; kk<nalfa; kk++){
-//	stiff(nnode*eldim+kk,mm)            += shapeh(kk)*d_stretch[0](mm) *iso_jacob*wgt;
-//	stiff(mm,           nnode*eldim+kk) += shapeh(kk)*d_stretch[0](mm) *iso_jacob*wgt;
-//      }
-
-//    double elastic = d_one/constitutive(0,0);
-// 
-//  for(int nn=0; nn<nnode*eldim; nn++)
-//    for(int mm=0; mm<nnode*eldim; mm++)
-//      for(int ii=1; ii<eldim; ii++)
-//	for(int jj=1; jj<eldim; jj++)
-//	  stiff(nn,mm)                      += d_stretch[ii](nn)*constitutive(ii,jj)*d_stretch[jj](mm) *iso_jacob*wgt;
-//
-//    for(int mm=0; mm<nnode*eldim; mm++)
-//      for(int pp=0; pp<nnode*eldim; pp++)
-//	for(int ii=0; ii<eldim; ii++)
-//	  stiff(mm,pp)                      += force(ii)*dd_stretch[ii](mm,pp)*iso_jacob*wgt;
-//
-//    for(int mm=0; mm<nnode*eldim; mm++)
-//      for(int kk=0; kk<nalfa; kk++){
-//	stiff(nnode*eldim+kk,mm)            += shapeh(kk)*d_stretch[0](mm) *iso_jacob*wgt;
-//	stiff(mm,           nnode*eldim+kk) += shapeh(kk)*d_stretch[0](mm) *iso_jacob*wgt;
-//      }
-//
-//    if(is_hybrid_elastic)
-//      for(int mm=0; mm<nalfa; mm++)
-//	for(int kk=0; kk<nalfa; kk++)
-//	  stiff(nnode*eldim+kk,nnode*eldim+mm) -= shapeh(kk)*shapeh(mm)*elastic*iso_jacob*wgt;
-//
 
