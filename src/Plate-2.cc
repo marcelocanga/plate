@@ -7,12 +7,12 @@
 #include "Diagnostic.hh"
 
 double Plate::wg[3]={1.0/6.0,1.0/6.0,1.0/6.0};
-double Plate::xg[2][3]={1./6.,2./3.,1./6.,
+double Plate::xg[2][3]={-1./3.,1./3.,0.,
                         1./6.,1./6.,2./3.};
-//double Plate::xg[2][3]={  0., 1.,     0.0,
+//double Plate::xg[2][3]={-1./2.,1./2., 0.0,
 //                          0.,  0.0,   1.0};
-//double Plate::xg[2][3]={ 0.5, 0.5,  0.0,
-//                         0. , 0.5,  1./2.};
+//double Plate::xg[2][3]={  0., 1./4., -1./4.,
+//                         0., 1./2.,  1./2.};
 
 int Plate::ip;
 double Plate::wgt,Plate::xr,Plate::xs;
@@ -198,7 +198,7 @@ void Plate::add_edge(){
     if(Point::u_point_s.count(&po_aux)){ 
       auto it = Point::u_point_s.find(&po_aux);
       point_v.push_back(*it);
-      std::clog<<"Already found edge: side:"<<iie<<", name:"<<(*it)->name<<std::endl;
+      diag_m(diag.echo,"Already found edge: side:"<<iie<<", name:"<<(*it)->name<<std::endl);
     }
     else{
       po_pt = new Point();
@@ -206,7 +206,7 @@ void Plate::add_edge(){
       scale(po_aux.coor,po_pt->coor);
       point_v.push_back(po_pt);
       Point::u_point_s.insert(po_pt);
-      std::clog<<"New edge: side"<<iie<<", name:"<<po_pt->name<<","<<po_pt->coor<<std::endl;
+      diag_m(diag.echo,"New edge: side"<<iie<<", name:"<<po_pt->name<<","<<po_pt->coor<<std::endl);
     }
 
   }
@@ -355,32 +355,32 @@ diag_l(diag.debug,
 
 void Plate::Shape()
 {
-  shape(0) = 1.0 - xr - xs;
-  shape(1) = xr;
+  shape(0) = 0.5 * (1.0 - 2.0 * xr - xs );
+  shape(1) = 0.5 * (1.0 + 2.0 * xr - xs );
   shape(2) = xs;
-  shape(3) = xr*xs - xr*xr*xs - xs*xs*xr;
+  shape(3) = 0.25*xs - xr*xr*xs - 0.5*xs*xs + 0.25*xs*xs*xs;
     
   d_shape(0,0) = -1.0; 
   d_shape(1,0) =  1.0;
   d_shape(2,0) =  0.0;
-  d_shape(3,0) =  xs - 2.0 * xr * xs - xs * xs;
+  d_shape(3,0) =  -2.0 * xr * xs;
   
-  d_shape(0,1) = -1.0;
-  d_shape(1,1) =  0.0;
+  d_shape(0,1) = -0.5;
+  d_shape(1,1) = -0.5;
   d_shape(2,1) =  1.0;
-  d_shape(3,1) =  xr - 2.0 * xr * xs - xr * xr ;
+  d_shape(3,1) =  0.25 - xr* xr - xs + 0.75 * xs * xs;
 
-  shape_h(0) =  1.0 - 2.0 * xs;
-  shape_h(1) = -1.0 + 2.0 * ( xr + xs);
-  shape_h(2) =  1.0 - 2.0 * xr;
+  shape_h(0) =  1.0       - 2.0 * xs;
+  shape_h(1) =  2.0 * xr  +       xs;
+  shape_h(2) = -2.0 * xr  +       xs;
     
   d_shape_h(0,0) =  0.0;
   d_shape_h(1,0) =  2.0; 
   d_shape_h(2,0) = -2.0;
 
   d_shape_h(0,1) = -2.0;
-  d_shape_h(1,1) =  2.0;
-  d_shape_h(2,1) =  0.0;
+  d_shape_h(1,1) =  1.0;
+  d_shape_h(2,1) =  1.0;
 }
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 //

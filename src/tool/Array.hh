@@ -1610,7 +1610,7 @@ std::ostream& operator << (std::ostream& out, Array<V,2>& b_mat){
     out<<i<<": ";
     for(int j=0; j<b_mat.size2(); j++){
       out<<b_mat(i,j);
-      out<<", ";
+      out<<",; ";
     }
     out<<std::endl;
   }

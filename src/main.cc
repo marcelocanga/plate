@@ -26,6 +26,11 @@ int main(int argc, char *argv[])
 {
   std::string input_file;
   Solver sol;
+
+  std::cout << std::fixed << std::showpoint;
+  std::cout << std::setprecision(6);
+  std::clog << std::fixed << std::showpoint;
+  std::clog << std::setprecision(3);
 //
 //*********************************************      first argument, input file name
 //

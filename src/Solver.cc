@@ -383,7 +383,7 @@ void Solver::solve(MDouble& mat, ADouble& vec)
 //
   std::cout<<"        : rhs  :        "<<vec<<std::endl;
   std::cout<<"        : lhs  :        "<<std::endl;
-  std::cout<<mat;
+  std::cout<<std::setprecision(9)<<mat;
   
 //
 //*********************************************      self trasnpose
