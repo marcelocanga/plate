@@ -6,6 +6,7 @@
 #include "Plate.hh"
 #include "Solver.hh"
 #include "Support.hh"
+#include "Report.hh"
 
 std::map<std::string, Point*>    Point::point_m;
 std::set<Point*,LtPoint>         Point::u_point_s;
@@ -37,9 +38,18 @@ int main(int argc, char *argv[])
   if(argc > 1) input_file = argv[1];
   else         input_file = "plate.inp";
 //
+//*********************************************      
+//
+  rep.set_fos(input_file);
+//
 //*********************************************      parse input
 //
   sol.parse_input(input_file);
+//
+//*********************************************      
+//
+  rep<<"hi there"<<std::endl;
+  rep.fos_close();
 //
 //*********************************************      done
 //

@@ -22,7 +22,7 @@ endif()
 message("CMAKE_PREFIX_PATH:" ${CMAKE_PREFIX_PATH})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY bin) 
 set(HEADER_FILES src/tool/Array.hh )
-set(MOST src/main.cc  src/Load.cc src/Support.cc src/Diagnostic.cc src/Point.cc src/Solver.cc src/tool/Essential.cc )
+set(MOST src/main.cc src/Load.cc src/Support.cc src/Diagnostic.cc src/Report.cc src/Point.cc src/Solver.cc src/tool/Essential.cc )
 
 add_executable(${myapp}  src/Plate.cc ${MOST} ${HEADER_FILES} )
 target_include_directories(${myapp} PRIVATE src/tool)

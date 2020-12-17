@@ -1,13 +1,16 @@
-#include<sstream>
-#include "Plate.hh"
-#include "Point.hh"
+#include <iostream>
+#include <fstream>
+#include "Report.hh"
+#include "Essential.hh"
+
+Report rep;
 
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 //
 //
-//               -----  Point::Point  -----
+//               -----  Report::Report  -----
 //
 //
 //
@@ -17,42 +20,40 @@
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-Point::Point(){
-  dof_loc = -1;
+Report::Report()
+{
 }
 
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 //
-//               -----  bool Point::get_index  -----
+//               -----  void Report::set_fos  -----
 //
 //
 // C: 
 //
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-bool Point::get_index(int idof, AInt& index)
+void Report::set_fos(std::string fin)
 {
-  if(dof_loc < 0) return false;
-
-  index.resize(1);
-  index(0) = dof_loc+idof;
-
-  return true;
+  fin.replace(fin.find(".inp"),fin.length(),".rep");
+  fos.open(fin);
 }
+
+void Report::fos_close()
+{
+  fos.close();
+}
+
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 //
-//               -----  std::string Point::new_name  -----
+//               -----  Report& Report::operator<<(std::ostream& omanip  -----
 //
 //
 // C: 
 //
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-std::string Point::new_name()
-{
-  std::stringstream ss;
-  static int index;
-  ss << index;
-  index++;
-  return "edge-"+ ss.str();
+Report& Report::operator<<(std::ostream& omanip(std::ostream &)){
+      omanip(std::clog);
+  return *this; 
 }
