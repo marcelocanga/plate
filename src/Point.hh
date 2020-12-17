@@ -23,6 +23,9 @@ public:
   friend class Solver;
   friend class Plate;
   friend class Load;
+  friend class Report;
+  
+  enum PointType {none_t,edge_t,node_t } type;
 
   Point();
   bool get_index(int,AInt&);

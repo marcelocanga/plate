@@ -14,13 +14,14 @@ protected:
   double def_poisson, def_thickness, def_young;
   static Solver* current_solver;
   MDouble lhs; 
-  ADouble rhs;
+  ADouble rhs,guess;
 public:
 
   friend class Point;
   friend class Plate;
   friend class Load;
   friend class Support;
+  friend class Report;
 
   Solver();
   static Solver* current(){ return current_solver;}

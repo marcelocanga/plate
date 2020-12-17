@@ -20,6 +20,7 @@ public:
   friend class Point;
   friend class Plate;
   friend class Solver;
+  friend class Report;
   
   static std::vector<Support*> support_v;
   

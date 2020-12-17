@@ -23,21 +23,24 @@ protected:
   std::vector<Point*> point_v;
   std::vector<int>    edof_loc;
 
-  static int ip;
   static double wgt,xr,xs;
   static double wg[3], xg[2][3];
   static ADouble shape,shape_h;
   static MDouble d_shape, d_shape_h;
   static MDouble b_grad, w_grad;
   static MDouble constitutive_b;
-  static MDouble constitutive_s;
+  static double  constitutive_s;
   static ADouble fint;
   static MDouble stiff;
+
+  static MDouble bending,rotation,d_deflec,curvature;
+  static ADouble shear;
 
 public:
   friend class Point;
   friend class Solver;
   friend class Load;
+  friend class Report;
 
   enum IndexType { support_t, moment_t, force_t};
 
@@ -63,7 +66,7 @@ public:
   bool get_index(int side,int ind, enum IndexType, AInt& index);
 
   void compute_stress();
-  void Stress();
+  void Stress(int);
 };
 
 

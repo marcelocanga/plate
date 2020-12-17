@@ -3,6 +3,7 @@
 #include "Solver.hh"
 #include "Support.hh"
 #include "Diagnostic.hh"
+#include "Report.hh"
 
 extern "C"{      // Lapack solvers
   //#include "Blas.h"
@@ -93,7 +94,8 @@ void Solver::parse_input(std::string file_name){
       iss >> po_pt->name;
       iss >> po_pt->coor(0) >> po_pt->coor(1) >> po_pt->coor(2) ;
       Point::point_m[po_pt->name] = po_pt;
-      diag_m(diag.info,"Point:"<<po_pt->name<<":"<<po_pt->coor(0)<<","<<po_pt->coor(1)<<","<<po_pt->coor(2)<<std::endl);
+      diag_m(diag.info,"Point:"<<po_pt->name<<":"<<po_pt->coor(0)<<","
+	     <<po_pt->coor(1)<<","<<po_pt->coor(2)<<std::endl);
     }
       break;
 //.............................................      plate
@@ -144,10 +146,12 @@ void Solver::parse_input(std::string file_name){
       Load::load_v.push_back(lo_pt);
 
       if (token == force_a){
-        diag_m(diag.info,"Force. Plate:"<<ename <<", side:"<<lo_pt->eside <<", value:"<<lo_pt->value <<std::endl);
+        diag_m(diag.info,"Force. Plate:"<<ename <<", side:"<<lo_pt->eside
+	       <<", value:"<<lo_pt->value <<std::endl);
       }
       else{
-        diag_m(diag.info,"Line Force. Plate:"<<ename <<", side:"<<lo_pt->eside <<", value:"<<lo_pt->value <<std::endl);
+        diag_m(diag.info,"Line Force. Plate:"<<ename <<", side:"<<lo_pt->eside
+	       <<", value:"<<lo_pt->value <<std::endl);
       }
     }
       break;
@@ -169,7 +173,8 @@ void Solver::parse_input(std::string file_name){
 
       Load::load_v.push_back(lo_pt);
 
-      diag_m(diag.info,"Moment. Point:"<<pname <<", dir:"<<lo_pt->gdir<<", value:"<<lo_pt->value<<std::endl);
+      diag_m(diag.info,"Moment. Point:"<<pname <<", dir:"<<lo_pt->gdir<<", value:"
+	     <<lo_pt->value<<std::endl);
 }
       break;
 //.............................................      line moment
@@ -190,7 +195,8 @@ void Solver::parse_input(std::string file_name){
 
       Load::load_v.push_back(lo_pt);
 
-      diag_m(diag.info,"Line Moment. Plate:"<<ename <<", side:"<<lo_pt->eside <<", dir:"<<lo_pt->gdir<<", value:"<<lo_pt->value<<std::endl);
+      diag_m(diag.info,"Line Moment. Plate:"<<ename <<", side:"<<lo_pt->eside <<", dir:"
+	     <<lo_pt->gdir<<", value:"<<lo_pt->value<<std::endl);
 }
       break;
 //.............................................      pressure
@@ -305,11 +311,12 @@ void Solver::run()
 //
 //*********************************************      solve system of equations
 //
-  solve(lhs,rhs);
+  copy (rhs,guess);
+  solve(lhs,guess);
 //
 //*********************************************      done
 //
-  for(auto const& [first,second] : Plate::plate_m) second->compute_stress();
+  rep.summary();
 //
 //*********************************************      done
 //
@@ -326,12 +333,16 @@ void Solver::run()
 
 void Solver::assemble()
 {
-  lhs.dim(ndof,ndof);
-  rhs.dim(ndof);
+  lhs.  dim(ndof,ndof);
+  rhs.  dim(ndof);
+  guess.dim(ndof);
 //
 //*********************************************      elements
 //
-  for(auto const& [first,second] : Plate::plate_m)     second->assemble();
+  for(auto const& [first,second] : Plate::plate_m){
+    second->potential();
+    second->assemble ();
+  }
 //
 //*********************************************      loads
 //

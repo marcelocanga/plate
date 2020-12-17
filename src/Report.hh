@@ -14,6 +14,7 @@ public:
   Report();
   void set_fos(std::string);
   void fos_close();
+  void summary();
 //
 //************************************************      operators
 //

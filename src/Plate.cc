@@ -14,15 +14,18 @@ double Plate::xg[2][3]={1./6.,2./3.,1./6.,
 //double Plate::xg[2][3]={ 0.5, 0.5,  0.0,
 //                         0. , 0.5,  1./2.};
 
-int Plate::ip;
 double Plate::wgt,Plate::xr,Plate::xs;
 ADouble Plate::shape,Plate::shape_h;
 MDouble Plate::d_shape, Plate::d_shape_h;
 MDouble Plate::b_grad, Plate::w_grad;
 MDouble Plate::constitutive_b;
-MDouble Plate::constitutive_s;
+double  Plate::constitutive_s;
 ADouble Plate::fint;
 MDouble Plate::stiff;
+
+MDouble Plate::bending,Plate::rotation,Plate::d_deflec,Plate::curvature;
+ADouble Plate::shear;
+
 
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -79,8 +82,14 @@ void Plate::init()
   fint.      dim(nedof);
   stiff.     dim(nedof,nedof);
 
+  bending.   dim(3,3);
+  rotation.  dim(2,3);
+  d_deflec.  dim(2,3);
+  shear.     dim(2);
+  curvature. dim(3,3);
+
   constitutive_b.dim(3,3);
-  constitutive_s.dim(2,2);
+
 }
 
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -141,7 +150,8 @@ void Plate::count_dof(int& ndof)
   for(int jj=0;jj<nnode;jj++){
     po_pt = point_v[jj];
     if(po_pt->dof_loc < 0){ 
-      po_pt->dof_loc = ndof;
+      po_pt->dof_loc  = ndof;
+      po_pt->type = Point::node_t;
       ndof +=2;
     }
     edof_loc.push_back(po_pt->dof_loc);
@@ -156,23 +166,20 @@ void Plate::count_dof(int& ndof)
     po_pt = point_v[jj+nnode];
     if(po_pt->dof_loc<0){
       po_pt->dof_loc = ndof;
+      po_pt->type = Point::edge_t;
       ndof += 1;
     }
     edof_loc.push_back(po_pt->dof_loc);
   }
 
-diag_l(diag.echo,
-  diag<<"Element dof, name:"<<name<<std::endl;
-  for(int ii=0; ii<13; ii++)
-  diag<<edof_loc[ii]<<" ";
-  diag<<std::endl;
-);
+  diag_l(diag.echo,
+	 diag<<"Element dof, name:"<<name<<std::endl;
+	 for(int ii=0; ii<13; ii++)
+	   diag<<edof_loc[ii]<<" ";
+	 diag<<std::endl;
+	 );
 
 }
-
-
-
-
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 //
 //               -----  void Plate::add_edge  -----
@@ -206,6 +213,7 @@ void Plate::add_edge(){
       scale(po_aux.coor,po_pt->coor);
       point_v.push_back(po_pt);
       Point::u_point_s.insert(po_pt);
+      Point::point_m[po_pt->name] = po_pt;
       diag_m(diag.echo,"New edge: side"<<iie<<", name:"<<po_pt->name<<","<<po_pt->coor<<std::endl);
     }
 
@@ -223,8 +231,6 @@ void Plate::add_edge(){
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 void Plate::assemble(){
-
-  potential();
 
   for(int ii=0; ii<nedof; ii++){
     for(int jj=0; jj<nedof; jj++)
@@ -257,10 +263,10 @@ void Plate::potential(){
     Stiffness();
   }
 
-diag_l(diag.echo,
-  diag<<"Area:"<<area<<std::endl;
-  diag<<"Fint:"<<fint<<std::endl;
-);
+  diag_l(diag.echo,
+	 diag<<"Area:"<<area<<std::endl;
+	 diag<<"Fint:"<<fint<<std::endl;
+	 );
 }
 
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -277,17 +283,24 @@ void Plate::compute_stress(){
 
   compute_constitutive();
 
+    
+  bending   = d_zero;
+  shear     = d_zero;
+  rotation  = d_zero;
+  d_deflec  = d_zero;
+  curvature = d_zero; 
+  
   for(int ii=0; ii<ninteg; ii++){
-
     SamplePoint(ii);
     Grad(ii);
-    Stress();
+    Stress(ii);
+    Stiffness();
   }
 
-diag_l(diag.echo,
-  diag<<"Area:"<<area<<std::endl;
-  diag<<"Fint:"<<fint<<std::endl;
-);
+  diag_l(diag.echo,
+	 diag<<"Area:"<<area<<std::endl;
+	 diag<<"Fint:"<<fint<<std::endl;
+	 );
 }
 
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -304,10 +317,10 @@ void Plate::SamplePoint(int integ){
   xr  = xg[0][integ];
   xs  = xg[1][integ];
 
-diag_l(diag.debug,
-  diag<<"integ:"<<integ<<std::endl;
-  diag<<"wgt:"<<wgt<<", xr:"<<xr<<", xs:"<<xs<<std::endl;
-);
+  diag_l(diag.debug,
+	 diag<<"integ:"<<integ<<std::endl;
+	 diag<<"wgt:"<<wgt<<", xr:"<<xr<<", xs:"<<xs<<std::endl;
+	 );
 }
 
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -321,9 +334,8 @@ diag_l(diag.debug,
 
 void Plate::compute_constitutive()
 {
-  double kfac = d_one;
-  double fac1 = young*thickness*thickness/(d_one-poisson*poisson);
-  double fac2 = young*kfac/ 2.0 / (d_one+poisson);
+  double kfac = young * thickness;
+  double fac1 = young * thickness*thickness*thickness/ 12.0 / (d_one-poisson*poisson);
 
   constitutive_b = d_zero;
 
@@ -333,14 +345,12 @@ void Plate::compute_constitutive()
   constitutive_b(1,1) = fac1;
   constitutive_b(2,2) = fac1 * (d_one - poisson) / 2.0;
 
-  constitutive_s      = d_zero;
-  constitutive_s(0,0) = fac2;
-  constitutive_s(1,1) = fac2;
+  constitutive_s      =  kfac / 2.0 / (d_one+poisson);
 
-diag_l(diag.debug,
-  diag<<"Constitutive: b"<<constitutive_b<<std::endl;
-  diag<<"Constitutive: s"<<constitutive_s<<std::endl;
-);
+  diag_l(diag.debug,
+	 diag<<"Constitutive: b"<<constitutive_b<<std::endl;
+	 diag<<"Constitutive: s"<<constitutive_s<<std::endl;
+	 );
 
 }
 
@@ -502,8 +512,7 @@ void Plate::Fint(){
 
 void Plate::Stiffness(){
 
-  double fac = d_area * wgt * thickness;
-
+  double fac  = d_area * wgt;
 //
 //*********************************************      bending 
 //
@@ -519,7 +528,7 @@ void Plate::Stiffness(){
 //*********************************************      shear
 //
   for(int nn=0; nn<2; nn++)
-    stiff(ncons*eldim+nn,ncons*eldim+nn)        += fac * constitutive_s(nn,nn);
+    stiff(ncons*eldim+nn,ncons*eldim+nn)        += fac / constitutive_s;
 //
 //*********************************************      constraints shear,bending
 //
@@ -554,31 +563,50 @@ void Plate::Stiffness(){
 //
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
-void Plate::Stress(){
+void Plate::Stress(int ip){
   
-  ADouble bending(8);
-  ADouble shear(2);
-
   int ncons = nnode+nidof;
+  Solver *so_pt = Solver::current();
 //
 //*********************************************      
 //
-  for(int ii=0; ii<ncons*eldim; ii++)
-    bending(ii) = Solver::current()->rhs(ii);
-  for(int ii=0; ii<2; ii++)
-    bending(ii) = Solver::current()->rhs(ncons*eldim+ii);  
+  for(int mm=0; mm<ncons; mm++)
+    for(int ii=0; ii<2; ii++){
+      int pp = edof_loc[mm*2+ii]; 
+      rotation(ii,ip)  += shape(mm)*so_pt->guess(pp) ;
+    }
+//
+//*********************************************      
+//
+  for(int mm=0; mm<ncons*eldim; mm++){
+    int pp = edof_loc[mm]; 
+    for(int ii=0; ii<3; ii++)
+      curvature(ii,ip)  += b_grad(ii,mm)*so_pt->guess(pp) ;
+  }
+//
+//*********************************************      
+//
+  for(int mm=0; mm<nedge; mm++){
+    int pp = edof_loc[eldim*(ncons+nshear)+mm]; 
+    for(int ii=0; ii<2; ii++)
+      d_deflec(ii,ip)  += w_grad(ii,mm)*so_pt->guess(pp) ;
+    }
 //
 //*********************************************      bending 
 //
-  for(int mm=0; mm<ncons*eldim; mm++)
+  for(int mm=0; mm<ncons*eldim; mm++){
+    int pp = edof_loc[mm]; 
     for(int ii=0; ii<3; ii++)
       for(int jj=0; jj<3; jj++)
-	bending(ii)   += thickness * constitutive_b(ii,jj)*b_grad(jj,mm)*bending(mm) ;
+	bending(ii,ip)  += thickness * constitutive_b(ii,jj)*b_grad(jj,mm)*so_pt->guess(pp) ;
+  }
 //
 //*********************************************      shear
 //
-  for(int nn=0; nn<2; nn++)
-    shear(nn)         += thickness *  constitutive_s(nn,nn)*shear(nn);
+  for(int ii=0; ii<2; ii++){
+    int pp = edof_loc[ncons*eldim+ii];
+    shear(ii) = so_pt->guess(pp);
+  }
 //
 //*********************************************      done
 //
