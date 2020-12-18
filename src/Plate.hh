@@ -15,7 +15,7 @@ protected:
   
   std::string name;
   
-  int ninteg;
+  static int ninteg;
   double area, d_area, pressure;
   int nnode,nedge,nidof,nshear,eldim,nedof;
   double poisson, thickness, young;
@@ -24,7 +24,10 @@ protected:
   std::vector<int>    edof_loc;
 
   static double wgt,xr,xs;
-  static double wg[3], xg[2][3];
+  //  static ADouble wg;
+  //  static MDouble xg;
+  static std::vector<double> xg_v[2];
+  static std::vector<double> wg_v;
   static ADouble shape,shape_h;
   static MDouble d_shape, d_shape_h;
   static MDouble b_grad, w_grad;
@@ -42,12 +45,17 @@ public:
   friend class Load;
   friend class Report;
 
-  enum IndexType { support_t, moment_t, force_t};
-
+  enum   IndexType   { support_t, moment_t, force_t};
+  enum   ShapeOrigin { corner_t = 1, edge_t = 2 };
+  static ShapeOrigin shape_origin;
+  
   static std::map<std::string, Plate*> plate_m;
   
   Plate();
   void init();
+  static void setup();
+  static void integration_point();
+  
   void SamplePoint(int);
  
   void add_edge();
@@ -59,6 +67,8 @@ public:
   void compute_constitutive();
   void Grad(int);
   void Shape();
+  void ShapeCorner();
+  void ShapeEdge();
 
   void Fint();
   void Stiffness();

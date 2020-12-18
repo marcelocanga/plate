@@ -64,7 +64,7 @@ extern char str_buffer[nbuffer];
 //************************************************      
 //
 #define diag_mesg(x,y) {  std::clog << y ; }     //else : if doesnt mix well with other if above
-#define diag_m(x,y) { if(diag.level(x)) { std::clog << y ;} }     //else : if doesnt mix well with other if above
+#define diag_m(x,y) { if(diag.level(x)) { std::clog<<diag.top_msg(x); std::clog << y ;} }     //else : if doesnt mix well with other if above
 #define diag_l(x,y) { if(diag.level(x)) { u_diag_f  ; y ; } } // else 
 
 #define u_program_error diag_list(diag.program,diag<<"Program error::"<< __PRETTY_FUNCTION__ <<std::endl);

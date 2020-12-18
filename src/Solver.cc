@@ -14,6 +14,7 @@ extern "C"{      // Lapack solvers
 
 Solver* Solver::current_solver;
 
+MDouble aux;
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -53,7 +54,8 @@ Solver::Solver()
 void Solver::parse_input(std::string file_name){
   
   enum { point_a,plate_a,force_a,moment_a,pressure_a,support_a,solve_a,young_a,
-         poisson_a, thickness_a, end_a, line_force_a, line_moment_a, diagnostic_a };
+         poisson_a, thickness_a, end_a, line_force_a, line_moment_a, diagnostic_a,
+	 line_support_a,internal_a};
   int token = end_a;
 
   std::string line;
@@ -68,6 +70,7 @@ void Solver::parse_input(std::string file_name){
     bool is_continue = true;
     
     if      (line.find("$")       != std::string::npos) continue;
+    else if (line.find("*inte")   != std::string::npos) token = internal_a;
     else if (line.find("*poin")   != std::string::npos) token = point_a;
     else if (line.find("*plat")   != std::string::npos) token = plate_a;
     else if (line.find("*forc")   != std::string::npos) token = force_a;
@@ -76,6 +79,7 @@ void Solver::parse_input(std::string file_name){
     else if (line.find("*lmom")   != std::string::npos) token = line_moment_a;
     else if (line.find("*pres")   != std::string::npos) token = pressure_a;
     else if (line.find("*supp")   != std::string::npos) token = support_a;
+    else if (line.find("*lsup")   != std::string::npos) token = line_support_a;
     else if (line.find("*solv")   != std::string::npos) token = solve_a;    
     else if (line.find("*youn")   != std::string::npos) token = young_a;    
     else if (line.find("*pois")   != std::string::npos) token = poisson_a;    
@@ -87,6 +91,15 @@ void Solver::parse_input(std::string file_name){
     if(is_continue) continue; 
     
     switch(token){
+//.............................................      internal
+//
+    case internal_a:{
+      int origin;
+      iss >> Plate::ninteg;
+      iss >> origin;
+      Plate::shape_origin = Plate::ShapeOrigin(origin);
+    }
+      break;
 //.............................................      point
 //
     case point_a:{
@@ -225,6 +238,7 @@ void Solver::parse_input(std::string file_name){
       break;
 //.............................................      support
 //
+    case line_support_a:
     case support_a:{
       std::string ename;
       Support *su_pt = new Support;
@@ -236,6 +250,14 @@ void Solver::parse_input(std::string file_name){
         diag_m(diag.error,"Plate in support not found:" << ename << std::endl);
         break;
       }
+
+      if(token == line_support_a){
+	iss >> su_pt->gdir;
+	su_pt->type = Support::line_t;
+      }
+      else
+	su_pt->type = Support::fix_t;
+	
 
       Support::support_v.push_back(su_pt);
 
@@ -336,6 +358,7 @@ void Solver::assemble()
   lhs.  dim(ndof,ndof);
   rhs.  dim(ndof);
   guess.dim(ndof);
+  aux.  dim(ndof,ndof);
 //
 //*********************************************      elements
 //
@@ -346,6 +369,7 @@ void Solver::assemble()
 //
 //*********************************************      loads
 //
+  copy(lhs,aux);
   for(auto const&  first         : Load::load_v)       first->assemble();
 //
 //*********************************************      support

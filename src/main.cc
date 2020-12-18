@@ -27,6 +27,7 @@ int main(int argc, char *argv[])
 {
   std::string input_file;
   Solver sol;
+  Plate::setup();
 
   std::cout << std::fixed << std::showpoint;
   std::cout << std::setprecision(6);

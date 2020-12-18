@@ -7,7 +7,16 @@
 #include "Diagnostic.hh"
 
 
-double  Plate::wgt,Plate::xr,Plate::xs;
+double Plate::wg[3]={1.0/6.0,1.0/6.0,1.0/6.0};
+double Plate::xg[2][3]={-1./3.,1./3.,0.,
+                        1./6.,1./6.,2./3.};
+
+//double Plate::xg[2][3]={  0., 1.,     0.0,
+//                          0.,  0.0,   1.0};
+//double Plate::xg[2][3]={ 0.5, 0.5,  0.0,
+//                         0. , 0.5,  1./2.};
+
+double Plate::wgt,Plate::xr,Plate::xs;
 ADouble Plate::shape,Plate::shape_h;
 MDouble Plate::d_shape, Plate::d_shape_h;
 MDouble Plate::b_grad, Plate::w_grad;
@@ -19,11 +28,6 @@ MDouble Plate::stiff;
 MDouble Plate::bending,Plate::rotation,Plate::d_deflec,Plate::curvature;
 ADouble Plate::shear;
 
-std::vector<double> Plate::xg_v[2];
-std::vector<double> Plate::wg_v;
-
-int Plate::ninteg = 13;
-Plate::ShapeOrigin Plate::shape_origin = ShapeOrigin::corner_t;
 
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -41,10 +45,10 @@ Plate::ShapeOrigin Plate::shape_origin = ShapeOrigin::corner_t;
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 Plate::Plate(){
+  init();
   area     = d_zero;
   d_area   = d_zero;
   pressure = d_zero;
-  init();
 }
 
 
@@ -59,6 +63,7 @@ Plate::Plate(){
 
 void Plate::init()
 {
+  ninteg   = 3;
   nnode    = 3;
   nedge    = 3;
   
@@ -79,28 +84,14 @@ void Plate::init()
   fint.      dim(nedof);
   stiff.     dim(nedof,nedof);
 
-  bending.   dim(3,ninteg);
-  rotation.  dim(2,ninteg);
-  d_deflec.  dim(2,ninteg);
+  bending.   dim(3,3);
+  rotation.  dim(2,3);
+  d_deflec.  dim(2,3);
   shear.     dim(2);
-  curvature. dim(3,ninteg);
+  curvature. dim(3,3);
 
   constitutive_b.dim(3,3);
 
-}
-
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-//
-//               -----  void Plate::setup  -----
-//
-//
-// C: choose integration points
-//
-//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
-
-void Plate::setup()
-{
-  integration_point();
 }
 
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
@@ -333,12 +324,12 @@ void Plate::compute_stress(){
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
 void Plate::SamplePoint(int integ){
-  
-  wgt = wg_v[integ];
-  xr  = xg_v[0][integ];
-  xs  = xg_v[1][integ];
 
-  diag_l(diag.detail,
+  wgt = wg [integ];
+  xr  = xg[0][integ];
+  xs  = xg[1][integ];
+
+  diag_l(diag.debug,
 	 diag<<"integ:"<<integ<<std::endl;
 	 diag<<"wgt:"<<wgt<<", xr:"<<xr<<", xs:"<<xs<<std::endl;
 	 );
@@ -375,7 +366,44 @@ void Plate::compute_constitutive()
 
 }
 
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+//
+//               -----  void Plate::Shape  -----
+//
+//
+// C: conforming and non-conforming triangle base functions
+//
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
+void Plate::Shape()
+{
+  shape(0) = 0.5 * (1.0 - 2.0 * xr - xs );
+  shape(1) = 0.5 * (1.0 + 2.0 * xr - xs );
+  shape(2) = xs;
+  shape(3) = 0.25*xs - xr*xr*xs - 0.5*xs*xs + 0.25*xs*xs*xs;
+    
+  d_shape(0,0) = -1.0; 
+  d_shape(1,0) =  1.0;
+  d_shape(2,0) =  0.0;
+  d_shape(3,0) =  -2.0 * xr * xs;
+  
+  d_shape(0,1) = -0.5;
+  d_shape(1,1) = -0.5;
+  d_shape(2,1) =  1.0;
+  d_shape(3,1) =  0.25 - xr* xr - xs + 0.75 * xs * xs;
+
+  shape_h(0) =  1.0       - 2.0 * xs;
+  shape_h(1) =  2.0 * xr  +       xs;
+  shape_h(2) = -2.0 * xr  +       xs;
+    
+  d_shape_h(0,0) =  0.0;
+  d_shape_h(1,0) =  2.0; 
+  d_shape_h(2,0) = -2.0;
+
+  d_shape_h(0,1) = -2.0;
+  d_shape_h(1,1) =  1.0;
+  d_shape_h(2,1) =  1.0;
+}
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 //
 //               -----  void Plate::Grad  -----
@@ -433,7 +461,7 @@ void Plate::Grad(int integ)
 //
 //*********************************************      
 //
-diag_l(diag.detail,
+diag_l(diag.debug,
   diag<<"d_area:"<<d_area<<std::endl;
   diag<<"dx"<<std::endl;
   diag<<dx<<std::endl;

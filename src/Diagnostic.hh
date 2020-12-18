@@ -9,12 +9,12 @@ class Diagnostic{
 
 public:
   
-  enum DiagLevel { none, error, info, echo, debug } diag_level;
+  enum DiagLevel { none, error, info, echo, debug, detail } diag_level;
   
   Diagnostic();
   bool level(enum DiagLevel);
   void set_level(int);
-
+  std::string top_msg(enum DiagLevel level);
 //
 //************************************************      operators
 //

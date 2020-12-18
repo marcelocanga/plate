@@ -17,11 +17,29 @@
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 //@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
 
+Support::Support()
+{
+  gdir = 0;
+}
+
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+//
+//               -----  void Support::assemble  -----
+//
+//
+// C: 
+//
+//@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@
+
 void Support::assemble()
 {
   AInt index;
-  
-  el_pt->get_index(eside-1,0,Plate::support_t,index);
+
+  if(type == fix_t)
+    el_pt->get_index(eside-1,-1,Plate::support_t,index);
+  else
+    el_pt->get_index(eside-1,gdir-1,Plate::support_t,index);
+
   Solver::current()->set_ans(index,d_zero);
 
 }

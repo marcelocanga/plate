@@ -6,6 +6,7 @@
 #include "Solver.hh"
 #include "Plate.hh"
 #include "Support.hh"
+#include "Diagnostic.hh"
 
 Report rep;
 
@@ -88,9 +89,6 @@ void Report::summary()
   
   Solver* so_pt = Solver::current();
 //
-//*********************************************      
-//
-//
 //*********************************************      points
 //
   rep<<" Points "<<std::endl;
@@ -141,7 +139,7 @@ void Report::summary()
     
     str = pad(10,first);
     
-    for(int ip=0; ip<3; ip++){
+    for(int ip=0; ip<Plate::ninteg; ip++){
     if(ip == 0){
     rep<<
       str          <<"   ";
@@ -162,26 +160,54 @@ void Report::summary()
 //
 //*********************************************      reaction forces, moments
 //
-  rep<<std::endl;
-  rep<<std::endl;
   prod(so_pt->lhs,so_pt->guess,so_pt->rhs);
-  rep<<" Reaction Forces/Moments  "<<std::endl;
+
+  diag_l(diag.none,
+	 diag << so_pt->lhs<<std::endl;
+	 diag << so_pt->guess<<std::endl;
+	 diag << so_pt->rhs<<std::endl;
+	 );
+  rep<<std::endl;
+  rep<<std::endl;
+
+  rep<<"  Reaction Forces/Moments  "<<std::endl;
   rep<<"   Element Side   R    MX      MY    MX   MY  "<<std::endl;
   rep<<"  --------------------------------------------"<<std::endl;
 
   for(auto su_pt : Support::support_v){
     AInt index;
-    su_pt->el_pt->get_index(su_pt->eside-1,0,Plate::support_t,index);
+    su_pt->el_pt->get_index(su_pt->eside-1,su_pt->gdir-1,Plate::support_t,index);
     str = pad(10,su_pt->el_pt->name);
-
+    if(su_pt->gdir == 1){
     rep<<
       str<<" "<<
-      so_pt->rhs(index(2))<<"  "<<
+      "     x     "<<
       so_pt->rhs(index(0))<<"  "<<
       so_pt->rhs(index(1))<<"  "<<
-      so_pt->rhs(index(3))<<"  "<<
-      so_pt->rhs(index(4))<<"  "<<
+      "     x     "<<
+      "     x     "<<
       std::endl;
+    }
+    else if(su_pt->gdir == 2){
+    rep<<
+      str<<" "<<
+      "     x     "<<
+      "     x     "<<
+      "     x     "<<
+      so_pt->rhs(index(0))<<"  "<<
+      so_pt->rhs(index(1))<<"  "<<
+      std::endl;
+    }
+    else{
+    rep<<
+      str<<" "<<
+      so_pt->rhs(index(4))<<"  "<<
+      so_pt->rhs(index(0))<<"  "<<
+      so_pt->rhs(index(1))<<"  "<<
+      so_pt->rhs(index(2))<<"  "<<
+      so_pt->rhs(index(3))<<"  "<<
+      std::endl;
+    }
   }
 
   //
@@ -198,7 +224,7 @@ void Report::summary()
     second->compute_stress();
     str = pad(10,first);
     
-    for(int ip=0; ip<3; ip++){
+    for(int ip=0; ip<Plate::ninteg; ip++){
     if(ip == 0){
     rep<<
       str          <<"   ";
@@ -227,7 +253,7 @@ void Report::summary()
     str = pad(10,first);
     second->compute_stress();
     
-    for(int ip=0; ip<3; ip++){
+    for(int ip=0; ip<Plate::ninteg; ip++){
     if(ip == 0){
     rep<<
       str          <<"   ";
