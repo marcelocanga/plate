@@ -2,23 +2,18 @@ cmake_minimum_required(VERSION 3.8.2)
 
 set(myapp plate)
 project(${myapp}  CXX)
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_CXX_EXTENSIONS OFF)
 #
 #*********************************************      system libraries
 #
-
-if(${U_ARCH} MATCHES  mac_64 )
-
- include_directories ( src/inc )
-
 find_library(BLAS_LIB      NAMES blas      HINTS /usr/lib )
 find_library(LAPACK_LIB    NAMES lapack    HINTS /usr/lib )
-
-endif()
-
 #
 #*********************************************      package libraries
 #
-
 message("CMAKE_PREFIX_PATH:" ${CMAKE_PREFIX_PATH})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY bin) 
 set(HEADER_FILES src/tool/Array.hh )
