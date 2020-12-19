@@ -28,6 +28,7 @@ If the build is succesful a new executable, plate,  will be available in the bin
 
 * Go to the example directory
 * Run the program,
+  
   *../build/bin/plate 3-patch.inp*
 
 The generated output is available in the new file 3-patch.rep
@@ -71,7 +72,7 @@ $ | | A line with the $ sign is ignored
 * Thickness = 0.1
 * M = 1.5
 * L = 3
-### example/3-patch-poisson.inp. 
+### example/3-patch-poisson.inp
 
 Same problem as above but with Poisson ratio = 0.3 . Transversal edge rotations are fixed to simulate an infinite long plate in the transversal direction.
 
