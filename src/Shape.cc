@@ -42,29 +42,6 @@ void Plate::integration_point()
   
   for(auto& ww : wg_v) ww *= 0.5;
 
-  double ans;
-
-  diag<<"ninteg:"<<ninteg<<std::endl;
-  diag<<"shape_origin:"<<shape_origin<<std::endl;
-
-  ans = d_zero;  
-  for(auto vv : xg_v[0]){
-    ans += vv;
-  }
-  diag<<"xg0:"<<ans<<std::endl;
-
-  ans = d_zero;  
-  for(auto vv : xg_v[1]){
-    ans += vv;
-  }
-  diag<<"xg1:"<<ans<<std::endl;
-
-  ans = d_zero;    
-  for(auto vv : wg_v){
-    ans += vv;
-  }
-  diag<<"wg:"<<ans<<std::endl;
-
 }
 
 

@@ -582,7 +582,7 @@ void Plate::Stress(int ip){
     int pp = edof_loc[mm]; 
     for(int ii=0; ii<3; ii++)
       for(int jj=0; jj<3; jj++)
-	bending(ii,ip)  += thickness * constitutive_b(ii,jj)*b_grad(jj,mm)*so_pt->guess(pp) ;
+	bending(ii,ip)  += constitutive_b(ii,jj)*b_grad(jj,mm)*so_pt->guess(pp) ;
   }
 //
 //*********************************************      shear
