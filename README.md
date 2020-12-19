@@ -44,10 +44,10 @@ Command | Record |Comment |
 *pressure   | e-name pressure | element name, pressure
 *force      | p-name value | Force on Point name, value
 *moment     | p-name value | Moment on Point name, value
-*lforce     | e-name s-id value | Line Force on element name, side id, value
-*lmoment    | e-name s-id dir value | Line Moment on Element name, side id, oment dir ,value
-*support    | e-name s-id  | Fix support on element name, side id
-*lsupport   | e-name s-id dir | Fix Rotation on element name, side id, dir
+*lforce     | e-name s-id value | Line Force on element name, edge id, value
+*lmoment    | e-name s-id dir value | Line Moment on Element name, edge id, oment dir ,value
+*support    | e-name s-id  | Fix support on element name, edge id
+*lsupport   | e-name s-id dir | Fix Rotation on element name, edge id, dir
 *solve | run | Run the program
 *end | | End the program
 $ | | A line with the $ sign is ignored
@@ -68,7 +68,7 @@ $ | | A line with the $ sign is ignored
 * Thickness = 0.1
 * M = 1.5
 * L = 3
-### example/3-patch-poisson.inp. Same problem as above but with Poisson ratio = 0.3 . Transversal side rotations are fixed to simulate an infinite long plate.
+### example/3-patch-poisson.inp. Same problem as above but with Poisson ratio = 0.3 . Transversal edge rotations are fixed to simulate an infinite long plate.
 
 #### Analytical solutions,
 
