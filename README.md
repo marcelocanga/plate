@@ -47,7 +47,7 @@ Command | Record |Comment |
 *force      | p-name value | Force on Point name, value
 *moment     | p-name value | Moment on Point name, value
 *lforce     | e-name s-id value | Line Force on element name, edge id, value
-*lmoment    | e-name s-id dir value | Line Moment on Element name, edge id, oment dir ,value
+*lmoment    | e-name s-id dir value | Line Moment on Element name, edge id, moment dir ,value
 *support    | e-name s-id  | Fix support on element name, edge id
 *lsupport   | e-name s-id dir | Fix Rotation on element name, edge id, dir
 *solve | run | Run the program
