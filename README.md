@@ -1,6 +1,6 @@
 
 # The Reissner-Mindlin Triangular Plate
-<img style="float: left;" src="resource/3-plate.png">
+<img style="float: left;" src="resource/element.png">
 
 The Reissner-Mindlin formulation is a plate and shell formulation of moderate thickness. The Arnold-Douglas implementation uses consistent linear interpolations for rotations, enriched with an interior bubble mode and non-conforming linear interpolations for the out of plane displacements. The formulation is a three field mixed interpolation on rotations, out of plane displacments and transverse shear. The formulation avoids the so called locking problem.
 
@@ -29,7 +29,7 @@ If the build is succesful a new executable, plate,  will be available in the bin
 * Run the program,
   *../build/bin/plate 3-patch.inp*
 
-The answers can be found in the file 3-patch.rep
+The generated output is available in the new file 3-patch.rep
 
 ## Program commands
 Command | Record |Comment |
