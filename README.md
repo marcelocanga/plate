@@ -4,7 +4,7 @@
 
 The Reissner-Mindlin formulation is a plate and shell formulation of moderate thickness. The Arnold-Douglas implementation uses conforming linear interpolations for rotations, enriched with an interior bubble mode and non-conforming linear interpolations for the out of plane displacements. The formulation is a three field mixed interpolation on rotations, out of plane displacments and transverse shear. The formulation avoids the so called locking problem.
 
-## Building the program
+## Building the program, plate
 The program is built with cmake. Please
 review the cmake file, CMakeLists.txt, in the program root directory.
 The program requires the external libraries Blas and Lapack
@@ -12,7 +12,8 @@ The program requires the external libraries Blas and Lapack
 * From a terminal, in the program root directory create the build dir
 
   *mkdir build*
-  *cd    build*
+
+  *cd build*
 
 * Run the cmake program builder,
 
@@ -56,7 +57,9 @@ $ | | A line with the $ sign is ignored
 
 <img style="float: left;" src="resource/3-plate.png">
 
-### example/3-patch.inp 1x3 cantiler plate with fixed rotations and displacement in one end and distributed moment in the other end. Poisson ratio  = 0
+### example/3-patch.inp 
+
+1x3 cantiler plate with fixed rotations and displacement in one end and distributed moment in the other end. Poisson ratio  = 0
 
 #### Analytical solutions,
 
@@ -68,7 +71,9 @@ $ | | A line with the $ sign is ignored
 * Thickness = 0.1
 * M = 1.5
 * L = 3
-### example/3-patch-poisson.inp. Same problem as above but with Poisson ratio = 0.3 . Transversal edge rotations are fixed to simulate an infinite long plate.
+### example/3-patch-poisson.inp. 
+
+Same problem as above but with Poisson ratio = 0.3 . Transversal edge rotations are fixed to simulate an infinite long plate in the transversal direction.
 
 #### Analytical solutions,
 
