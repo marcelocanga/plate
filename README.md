@@ -11,18 +11,21 @@ review the cmake file, CMakeLists.txt, in the program root directory.
 The program requires the external libraries Blas and Lapack
 
 * From a terminal, in the program root directory create the build dir
-
-  *mkdir build*
-
-  *cd build*
+```
+mkdir build
+cd build
+```
 
 * Run the cmake program builder,
 
-  *cmake ../*
+```
+cmake ..
+```
 
 * Build the program with make using the generated Makefile
-
-  *make*
+```
+make
+```
 
 If the build is succesful a new executable, plate,  will be available in the bin directory.
 ## Run the program
@@ -30,7 +33,9 @@ If the build is succesful a new executable, plate,  will be available in the bin
 * Go to the example directory
 * Run the program,
   
-  *../build/bin/plate 3-patch.inp*
+```
+  ../build/bin/plate 3-patch.inp
+```
 
 The generated output is available in the new file 3-patch.rep
 
@@ -65,25 +70,28 @@ $ | | A line with the $ sign is ignored
 
 #### Analytical solutions,
 
-* End Rotation     = M L / EI       = 0.54
-* End Displacement = M L^2 / 2 EI   = 0.81
+```
+End Rotation     = M L / EI       = 0.54
+End Displacement = M L^2 / 2 EI   = 0.81
 
-* E = 10^5
-* I = Thickness ^ 3 / 12
-* Thickness = 0.1
-* M = 1.5
-* L = 3
+E = 10^5
+I = Thickness ^ 3 / 12
+Thickness = 0.1
+M = 1.5
+L = 3
+```
 ### example/3-patch-poisson.inp
 
 Same problem as above but with Poisson ratio = 0.3 . Transversal edge rotations are fixed to simulate an infinite long plate in the transversal direction.
 
 #### Analytical solutions,
 
-* End Rotation     = (1 - PR*PR ) M L / EI       = 0.4914
-* End Displacement = (1 - PR*PR ) M L^2 / 2 EI   = 0.7371
+```
+End Rotation     = (1 - PR*PR ) M L / EI       = 0.4914
+End Displacement = (1 - PR*PR ) M L^2 / 2 EI   = 0.7371
 
-* PR = 0.3
-
+PR = 0.3
+```
 
 ## Reference
 Arnold, Douglas N., and Richard S. Falk. "A uniformly accurate finite element method for the Reissner-Mindlin plate." SIAM Journal on Numerical Analysis 26.6 (1989): 1276-1290.
