@@ -58,7 +58,7 @@ Command | Record |Comment |
 *lsupport   | e-name edge-id dir | Fix Rotation on element name, edge id, rotation dir
 *solve | run | Run the program
 *end | | End the program
-$ | | A line with the $ sign is ignored
+$ | | A line with an $ char is ignored
 
 ## Example. 
 
