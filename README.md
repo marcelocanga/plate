@@ -10,17 +10,17 @@ The file requires the system libraries Blas and Lapack
 
 From a terminal, in the program root directory make a build dir
 
-mkdir build
-cd    build
-cmake ../
-make
+* mkdir build
+* cd    build
+* cmake ../
+* make
 
 Now the program plate is in the bin directory
 ## Run the program
 
-Go to the example directory
-Run the program,
-../build/bin/plate 3-patch.inp
+* Go to the example directory
+* Run the program,
+* ../build/bin/plate 3-patch.inp *
 
 The answers can be found in the file 3-patch.rep
 
@@ -51,24 +51,24 @@ $ | | A line with the $ sign is ignored
 
 ### example/3-patch.inp 1x3 cantiler plate with fixed rotations and displacement in one end and distributed moment in the other end. Poisson ratio  = 0
 
-Analytical solutions,
+#### Analytical solutions,
 
-Rotation     = M L / EI       = 0.54
-Displacement = M L^2 / 2 EI   = 0.81
+* Rotation     = M L / EI       = 0.54
+* Displacement = M L^2 / 2 EI   = 0.81
 
-E = 10^5
-I = Thickness ^ 3 / 12
-Thickness = 0.1
-M = 1.5
-L = 3
+* E = 10^5
+* I = Thickness ^ 3 / 12
+* Thickness = 0.1
+* M = 1.5
+* L = 3
 ### example/3-patch-poisson.inp. Same problem as above but with Poisson ratio = 0.3 . Transversal side rotations are fixed to simulate an infinite long plate.
 
-Analytical solutions,
+#### Analytical solutions,
 
-Rotation     = (1 - PR*PR ) M L / EI       = 0.4914
-Displacement = (1 - PR*PR ) M L^2 / 2 EI   = 0.7371
+* Rotation     = (1 - PR*PR ) M L / EI       = 0.4914
+* Displacement = (1 - PR*PR ) M L^2 / 2 EI   = 0.7371
 
-PR = 0.3
+* PR = 0.3
 
 
 ## Reference
