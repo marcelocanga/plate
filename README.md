@@ -34,7 +34,7 @@ Command | Record |Comment |
 *point      | 3-float  | Point X Y Z coordinates
 *plate      | 3-string | Plate 3 point names
 *pressure   | @ pressure  | Pressure on all elements, value
-            | e-name pressure | element name, pressure
+*pressure   | e-name pressure | element name, pressure
 *force      | p-name value | Force on Point name, value
 *moment     | p-name value | Moment on Point name, value
 *lforce     | e-name s-id value | Line Force on element name, side id, value
