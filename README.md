@@ -25,25 +25,25 @@ Run the program,
 The answers can be found in the file 3-patch.rep
 
 ## Program commands
-|Command | Record |Comment |
-|------------|--------------------------------|
-|*diagnostic | 0 to 5 | 0 = none, 5 detail log
-|*thickness  | float  | Plate thickness
-|*young      | float  | Young's Modulus
-|*poisson    | 0 to 0.5 | Poisson's ratio
-|*point      | 3-float  | Point X Y Z coordinates
-|*plate      | 3-string | Plate 3 point names
-|*pressure   | @ pressure  | Pressure on all elements, value
-|            | e-name pressure | element name, pressure
-|*force      | p-name value | Force on Point name, value
-|*moment     | p-name value | Moment on Point name, value
-|*lforce     | e-name s-id value | Line Force on element name, side id, value
-|*lmoment    | e-name s-id dir value | Line Moment on Element name, side id, moment dir ,value
-|*support    | e-name s-id  | Fix support on element name, side id
-|*lsupport   | e-name s-id dir | Fix Rotation on element name, side id, dir
-|*solve | run | Run the program
-|*end | | End the program
-|$ | | A line with the $ sign is ignored
+Command | Record |Comment |
+------------|-------|-------------------------|
+*diagnostic | 0 to 5 | 0 = none, 5 detail log
+*thickness  | float  | Plate thickness
+*young      | float  | Young's Modulus
+*poisson    | 0 to 0.5 | Poisson's ratio
+*point      | 3-float  | Point X Y Z coordinates
+*plate      | 3-string | Plate 3 point names
+*pressure   | @ pressure  | Pressure on all elements, value
+            | e-name pressure | element name, pressure
+*force      | p-name value | Force on Point name, value
+*moment     | p-name value | Moment on Point name, value
+*lforce     | e-name s-id value | Line Force on element name, side id, value
+*lmoment    | e-name s-id dir value | Line Moment on Element name, side id, oment dir ,value
+*support    | e-name s-id  | Fix support on element name, side id
+*lsupport   | e-name s-id dir | Fix Rotation on element name, side id, dir
+*solve | run | Run the program
+*end | | End the program
+$ | | A line with the $ sign is ignored
 
 ## Example. 
 
