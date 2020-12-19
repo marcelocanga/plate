@@ -51,7 +51,7 @@ Command | Record |Comment |
 *pressure   | @ value  | Pressure on all elements, pressure value
 *pressure   | e-name value | element name, pressure
 *force      | p-name value | Force on Point name, value
-*moment     | p-name dir value | Moment on Point name, value
+*moment     | p-name dir value | Moment on Point name, dir, value
 *lforce     | e-name edge-id value | Line Force on element name, edge id, value
 *lmoment    | e-name edge-id dir value | Line Moment on Element name, edge id, moment dir ,value
 *support    | e-name edge-id  | Fix support on element name, edge id
