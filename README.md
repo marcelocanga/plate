@@ -46,16 +46,16 @@ Command | Record |Comment |
 *thickness  | float  | Plate thickness
 *young      | float  | Young's Modulus
 *poisson    | 0 to 0.5 | Poisson's ratio
-*point      | 3-float  | Point X Y Z coordinates
-*plate      | 3-string | Plate 3 point names
-*pressure   | @ pressure  | Pressure on all elements, value
-*pressure   | e-name pressure | element name, pressure
+*point      | p-name 3-float  | Point name and X Y Z coordinates
+*plate      | e-name 3-p-name | Plate name and 3 point names
+*pressure   | @ float  | Pressure on all elements, pressure value
+*pressure   | e-name value | element name, pressure
 *force      | p-name value | Force on Point name, value
 *moment     | p-name value | Moment on Point name, value
-*lforce     | e-name s-id value | Line Force on element name, edge id, value
-*lmoment    | e-name s-id dir value | Line Moment on Element name, edge id, moment dir ,value
-*support    | e-name s-id  | Fix support on element name, edge id
-*lsupport   | e-name s-id dir | Fix Rotation on element name, edge id, dir
+*lforce     | e-name edge-id value | Line Force on element name, edge id, value
+*lmoment    | e-name edge-id dir value | Line Moment on Element name, edge id, moment dir ,value
+*support    | e-name edge-id  | Fix support on element name, edge id
+*lsupport   | e-name edge-id dir | Fix Rotation on element name, edge id, rotation dir
 *solve | run | Run the program
 *end | | End the program
 $ | | A line with the $ sign is ignored
