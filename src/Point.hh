@@ -71,5 +71,4 @@ struct LtPoint
 };
 
 
-
-#endif
+#endif Point
