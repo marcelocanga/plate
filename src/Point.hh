@@ -70,5 +70,4 @@ struct LtPoint
   }
 };
 
-
 #endif 
